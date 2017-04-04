@@ -100,10 +100,12 @@ class PerplexityCalculator():
             train_BOW.append(train_words)
             test_BOW.append(test_words)
         write_BOW_file(train_BOW, lda_directory_path+'/data/trainBOW')
+        write_BOW_file(test_BOW, lda_directory_path+'/data/testBOW')
         self.test_BOW=test_BOW
 
     def execute_estimation(self):
         for i in range(self.k_min, self.k_max, self.kstep):
+            sys.stdout.write('estimating(' +str(i)+ 'topics-LDA)...\r')
             command=create_command_string(i, self.iteration)
             subprocess.call(command.split(' '), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
@@ -132,7 +134,9 @@ class PerplexityCalculator():
 
     def run(self):
         self.split_train_test()
+        print('split done')
         self.execute_estimation()
+        print('estimate done')
         self.calculate_perplexity()
 
 
@@ -143,7 +147,7 @@ if __name__=='__main__':
     parser.add_argument("k_max", help="max number of topics for calculation of perplexity", type=int)
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of perplexity", type=int, default=1)
     parser.add_argument("-r", "--rate", help="rate of train data", default=0.7)
-    parser.add_argument("-i", "--iteration", help="number of iterations", default=100)
+    parser.add_argument("-i", "--iteration", help="number of iterations(>10)", default=100)
     args = parser.parse_args()
     calculator=PerplexityCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.rate, args.iteration)
     calculator.run()
