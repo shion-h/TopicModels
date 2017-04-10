@@ -63,7 +63,9 @@ public:
     virtual void printNum()const;
     virtual void printHyperParameter()const;
     virtual void writeParameter(string thetaFilename,string phiFilename,string alphaFilename,string betaFilename)const;
-    virtual void samplingParam();
+    virtual void writeTheta(string thetaFilename)const;
+    virtual void writePhi(string phiFilename)const;
+    virtual void samplingParameter();
     virtual void runIteraion()=0;
 };
 
@@ -203,20 +205,6 @@ void BaseGibbsSampler<MODEL>::printHyperParameter()const{//{{{
     cout<<endl;
 }//}}}
 template<typename MODEL>
-void BaseGibbsSampler<MODEL>::computeParameter(){//{{{
-    for(int d=0;d<_thetaAve.size();d++){
-        for(int k=0;k<_model->K;k++){
-            _thetaAve[d][k]=_thetaAve[d][k]/static_cast<double>(_nThIterationSample.size());
-        }
-    }
-    for(int k=0;k<_model->K;k++){
-        for(int v=0;v<_model->V;v++){
-            _phiAve[k][v]=_phiAve[k][v]/static_cast<double>(_nThIterationSample.size());
-        }
-    }
-
-}//}}}
-template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printTopFactor(int numOfTopFactor)const{//{{{
     vector<vector<double> > topFactorOfTheta;
     vector<vector<int> >  topFactorOfThetaIndex;
@@ -300,6 +288,20 @@ void BaseGibbsSampler<MODEL>::printTopFactor(int numOfTopFactor)const{//{{{
     cout<<endl;
 }//}}}
 template<typename MODEL>
+void BaseGibbsSampler<MODEL>::computeParameter(){//{{{
+    for(int d=0;d<_thetaAve.size();d++){
+        for(int k=0;k<_model->K;k++){
+            _thetaAve[d][k]=_thetaAve[d][k]/static_cast<double>(_nThIterationSample.size());
+        }
+    }
+    for(int k=0;k<_model->K;k++){
+        for(int v=0;v<_model->V;v++){
+            _phiAve[k][v]=_phiAve[k][v]/static_cast<double>(_nThIterationSample.size());
+        }
+    }
+
+}//}}}
+template<typename MODEL>
 void BaseGibbsSampler<MODEL>::writeParameter(string thetaFilename,string phiFilename,string alphaFilename,string betaFilename)const{//{{{
     ofstream thetaOutput;
     ofstream phiOutput;
@@ -343,7 +345,37 @@ void BaseGibbsSampler<MODEL>::writeParameter(string thetaFilename,string phiFile
     betaOutput.close();
 }//}}}
 template<typename MODEL>
-void BaseGibbsSampler<MODEL>::samplingParam(){//{{{
+void BaseGibbsSampler<MODEL>::writeTheta(string thetaFilename)const{//{{{
+    ofstream thetaOutput;
+    thetaOutput.open(thetaFilename,ios::out);
+
+    for(int i=0;i<_model->theta.size();i++){
+        for(int j=0;j<_model->theta[i].size();j++){
+            thetaOutput<<_model->theta[i][j];
+            if(j!=(_model->theta[i].size()-1)){
+                thetaOutput<<',';
+            }
+        }
+        thetaOutput<<endl;
+    }
+}//}}}
+template<typename MODEL>
+void BaseGibbsSampler<MODEL>::writePhi(string phiFilename)const{//{{{
+    ofstream phiOutput;
+    phiOutput.open(phiFilename,ios::out);
+
+    for(int i=0;i<_model->phi.size();i++){
+        for(int j=0;j<_model->phi[i].size();j++){
+            phiOutput<<_model->phi[i][j];
+            if(j!=(_model->phi[i].size()-1)){
+                phiOutput<<',';
+            }
+        }
+        phiOutput<<endl;
+    }
+}//}}}
+template<typename MODEL>
+void BaseGibbsSampler<MODEL>::samplingParameter(){//{{{
 
     for(int d=0;d<_thetaAve.size();d++){
         for(int k=0;k<_model->K;k++){

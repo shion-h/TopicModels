@@ -94,7 +94,7 @@ void OrdinaryGibbsSamplerFromLDA::runIteraion(){//{{{
     _iteration++;
     for(int i=0;i<_nThIterationSample.size();i++){
         if(_iteration==_nThIterationSample[i]){
-            samplingParam();
+            samplingParameter();
             break;
         }
     }
