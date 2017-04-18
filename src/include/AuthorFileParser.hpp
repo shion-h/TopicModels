@@ -15,9 +15,8 @@ class AuthorFileParser:private BOWFileParser{
 public:
     AuthorFileParser(string filename);
     void readAuthorFile();
-    void makeAuthorList();
+    void makeBagOfAuthorsNum();
     void writeAuthorList(string authorListFilename)const;
-    void assignNumbersToAuthors();
     const vector<vector<unsigned int> > &getBagOfAuthorsNum()const{
         return _bagOfWordsNum;
     }

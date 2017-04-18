@@ -8,6 +8,7 @@
 //
 
 #include"include/BOWFileParser.hpp"
+#include<sstream>
 
 using namespace std;
 
@@ -20,76 +21,55 @@ BOWFileParser::~BOWFileParser(){//{{{
 }//}}}
 
 void BOWFileParser::readBOWFile(){//{{{
-    vector<string > vbuf;
     string buf;
 
     if(!_inputText){
-        cout<<"erRor";
+        cout<<"Can't open BOWfile";
         exit(1);
     }
-    char c;
-    while(_inputText.get(c)){
-        if(c==','){
-            // buf+='\0';
-            vbuf.push_back(buf);
-            buf.clear();
-        }else if(c=='\n'){
-            // buf+='\0';
-            vbuf.push_back(buf);
-            buf.clear();
-            _bagOfWords.push_back(vbuf);
-            vbuf.clear();
-        }else{
-            buf+=c;
+    string str;
+    for(int i=0;getline(_inputText,str);i++){
+        vector<unsigned int > intVec;
+        string token;
+        istringstream stream(str);
+
+        if(i==0){
+            for(int j=0;getline(stream,token,',');j++){
+                if(j==0)continue;
+                _wordList.push_back(token);
+            }
+            continue;
         }
+        for(int j=0;getline(stream,token,',');j++){
+            if(j==0)continue;
+            intVec.push_back(stoi(token));
+        }
+        _frequencyMatrix.push_back(intVec);
     }
 
+
+    _V=_wordList.size();
 }//}}}
 
-void BOWFileParser::makeWordList(){//{{{
-    unsigned int flag=0;
-
-    for(int d=0;d<_bagOfWords.size();d++){
-        for(int i=0;i<_bagOfWords[d].size();i++){
-            for(int v=0;v<_V;v++){
-                if(_wordList[v]==_bagOfWords[d][i]){
-                    flag=1;
-                    break;
-                }
+void BOWFileParser::makeBagOfWordsNum(){//{{{
+    for(int i=0;i<_frequencyMatrix.size();i++){
+        vector<unsigned int> intVec;
+        for(int j=0;j<_frequencyMatrix[i].size();j++){
+            for(int k=0;k<_frequencyMatrix[i][j];k++){
+                intVec.push_back(j);
             }
-            if(flag==0){//new word
-                _wordList.push_back(_bagOfWords[d][i]);
-                _V++;
-            }
-            flag=0;
         }
+        _bagOfWordsNum.push_back(intVec);
     }
-
 }//}}}
 
 void BOWFileParser::writeWordList(string wordListFilename)const{//{{{
-    ofstream _wordListFp;
-    _wordListFp.open(wordListFilename,ios::out);
-    for(int v=0;v<_V;v++){
-        _wordListFp<<_wordList[v];
-        if(v!=(_V-1))_wordListFp<<endl;
+    ofstream wordListFp;
+    wordListFp.open(wordListFilename,ios::out);
+    for(int v=0;v<_wordList.size();v++){
+        wordListFp<<_wordList[v];
+        if(v!=(_wordList.size()-1))wordListFp<<endl;
     }
-    _wordListFp.close();
-
-}//}}}
-
-void BOWFileParser::assignNumbersToWords(){//{{{
-    for(int d=0;d<_bagOfWords.size();d++){
-        vector<unsigned int> ibuf;
-        for(int i=0;i<_bagOfWords[d].size();i++){
-            for(int v=0;v<_V;v++){
-                if(_bagOfWords[d][i]==_wordList[v]){
-                    ibuf.push_back(v);
-                    break;
-                }
-            }
-        }
-        _bagOfWordsNum.push_back(ibuf);
-    }
+    wordListFp.close();
 
 }//}}}

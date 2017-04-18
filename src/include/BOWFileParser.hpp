@@ -21,15 +21,14 @@ protected:
     ifstream _inputText;
     vector<string> _wordList;
     unsigned int _V;
-    vector<vector<string > > _bagOfWords;
+    vector<vector<unsigned int> > _frequencyMatrix;
     vector<vector<unsigned int> > _bagOfWordsNum;
 public:
     BOWFileParser(string filename);
     ~BOWFileParser();
     void readBOWFile();
-    void makeWordList();
+    void makeBagOfWordsNum();
     void writeWordList(string wordListFilename)const;
-    void assignNumbersToWords();
     const vector<vector<unsigned int> > &getBagOfWordsNum()const{
         return _bagOfWordsNum;
     }

@@ -88,9 +88,8 @@ int main(int argc, char *argv[]){
 
     BOWFileParser parser(BOWFilename);
     parser.readBOWFile();
-    parser.makeWordList();
+    parser.makeBagOfWordsNum();
     parser.writeWordList(wordListFilename);
-    parser.assignNumbersToWords();
     unsigned int V=parser.getV();
     vector<vector<unsigned int> > bagOfWordsNum=parser.getBagOfWordsNum();
 

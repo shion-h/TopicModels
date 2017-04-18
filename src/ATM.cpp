@@ -88,9 +88,8 @@ int main(int argc, char *argv[]){
 
     BOWFileParser parser(BOWFilename);
     parser.readBOWFile();
-    parser.makeWordList();
+    parser.makeBagOfWordsNum();
     parser.writeWordList(wordListFilename);
-    parser.assignNumbersToWords();
     unsigned int V=parser.getV();
     vector<vector<unsigned int> > bagOfWordsNum=parser.getBagOfWordsNum();
 
@@ -115,9 +114,8 @@ int main(int argc, char *argv[]){
     }
     AuthorFileParser authorFileParser(authorFilename);
     authorFileParser.readAuthorFile();
-    authorFileParser.makeAuthorList();
+    authorFileParser.makeBagOfAuthorsNum();
     authorFileParser.writeAuthorList(authorListFilename);
-    authorFileParser.assignNumbersToAuthors();
     unsigned int A=authorFileParser.getY();
     vector<vector<unsigned int> > bagOfAuthorsNum=authorFileParser.getBagOfAuthorsNum();
     // shared_ptr<GibbsSamplerFromATM> gibbsSampler;

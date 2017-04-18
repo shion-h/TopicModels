@@ -19,14 +19,10 @@ void AuthorFileParser::readAuthorFile(){//{{{
     readBOWFile();
 }//}}}
 
-void AuthorFileParser::makeAuthorList(){//{{{
-    makeWordList();
+void AuthorFileParser::makeBagOfAuthorsNum(){//{{{
+    makeBagOfWordsNum();
 }//}}}
 
 void AuthorFileParser::writeAuthorList(string authorListFilename)const{//{{{
     writeWordList(authorListFilename);
-}//}}}
-
-void AuthorFileParser::assignNumbersToAuthors(){//{{{
-    assignNumbersToWords();
 }//}}}

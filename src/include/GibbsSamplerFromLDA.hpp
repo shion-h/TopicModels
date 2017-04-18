@@ -63,8 +63,8 @@ public:
     virtual void printNum()const;
     virtual void printHyperParameter()const;
     virtual void writeParameter(string thetaFilename,string phiFilename,string alphaFilename,string betaFilename)const;
-    virtual void writeTheta(string thetaFilename)const;
-    virtual void writePhi(string phiFilename)const;
+    virtual void writeThetaEx(string thetaFilename)const;
+    virtual void writePhiEx(string phiFilename)const;
     virtual void samplingParameter();
     virtual void runIteraion()=0;
 };
@@ -345,14 +345,14 @@ void BaseGibbsSampler<MODEL>::writeParameter(string thetaFilename,string phiFile
     betaOutput.close();
 }//}}}
 template<typename MODEL>
-void BaseGibbsSampler<MODEL>::writeTheta(string thetaFilename)const{//{{{
+void BaseGibbsSampler<MODEL>::writeThetaEx(string thetaFilename)const{//{{{
     ofstream thetaOutput;
     thetaOutput.open(thetaFilename,ios::out);
 
-    for(int i=0;i<_model->theta.size();i++){
-        for(int j=0;j<_model->theta[i].size();j++){
-            thetaOutput<<_model->theta[i][j];
-            if(j!=(_model->theta[i].size()-1)){
+    for(int i=0;i<_model->thetaEx.size();i++){
+        for(int j=0;j<_model->thetaEx[i].size();j++){
+            thetaOutput<<_model->thetaEx[i][j];
+            if(j!=(_model->thetaEx[i].size()-1)){
                 thetaOutput<<',';
             }
         }
@@ -360,14 +360,14 @@ void BaseGibbsSampler<MODEL>::writeTheta(string thetaFilename)const{//{{{
     }
 }//}}}
 template<typename MODEL>
-void BaseGibbsSampler<MODEL>::writePhi(string phiFilename)const{//{{{
+void BaseGibbsSampler<MODEL>::writePhiEx(string phiFilename)const{//{{{
     ofstream phiOutput;
     phiOutput.open(phiFilename,ios::out);
 
     for(int i=0;i<_model->phi.size();i++){
-        for(int j=0;j<_model->phi[i].size();j++){
-            phiOutput<<_model->phi[i][j];
-            if(j!=(_model->phi[i].size()-1)){
+        for(int j=0;j<_model->phiEx[i].size();j++){
+            phiOutput<<_model->phiEx[i][j];
+            if(j!=(_model->phiEx[i].size()-1)){
                 phiOutput<<',';
             }
         }
