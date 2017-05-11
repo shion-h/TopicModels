@@ -88,8 +88,8 @@ def run_WBIC_metropolis(BOW, alpha, beta, n=0):
                             log_likelihood_candidate, log_prior_value_candidate, n)
         acceptance_prob = np.exp(target_dist_value_candidate - target_dist_value +
                                  log_prior_value - log_prior_value_candidate)
-        print(target_dist_value_candidate, target_dist_value, log_prior_value, log_prior_value_candidate)
-        print(acceptance_prob)
+        # print(target_dist_value_candidate, target_dist_value, log_prior_value, log_prior_value_candidate)
+        # print(acceptance_prob)
         if acceptance_prob > np.random.uniform():
             acceptance_times += 1
             theta = theta_candidate

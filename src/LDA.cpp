@@ -14,6 +14,7 @@
 #include "include/OrdinaryGibbsSamplerFromLDA.hpp"
 #include "include/CollapsedGibbsSamplerFromLDA.hpp"
 #include "include/CollapsedGibbsSamplerFromATM.hpp"
+#include "include/VariationalBayesEstimatorOnLDA.hpp"
 //}}}
 
 using namespace std;
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]){
     ("nmit,s", boost::program_options::value<unsigned int>()->default_value(1000), "number of iterations")
     ("bnin,b", boost::program_options::value<unsigned int>(), "burn in period")
     ("intv,i", boost::program_options::value<unsigned int>()->default_value(10), "sampling interval")
-    ("lrna,l", boost::program_options::value<unsigned int>()->default_value(1), "learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling)")
+    ("lrna,l", boost::program_options::value<unsigned int>()->default_value(1), "learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)")
     ("nmsh,f", boost::program_options::value<unsigned int>()->default_value(5), "number of factors with high probability to show")
     ("otpt,o", boost::program_options::value<string>()->default_value("./"), "directory name for output")
     ;
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]){
     string phiFilename;
     string alphaFilename;
     string betaFilename;
+    string VLBFilename;
     string wordListFilename;
     if (vm.count("help") || !vm.count("BOWfile")){
         cout<<"Usage:\n LDA [BOW file] [-options] "<<endl;
@@ -83,6 +85,7 @@ int main(int argc, char *argv[]){
         phiFilename=outputDirectory+"phi.csv";
         alphaFilename=outputDirectory+"alpha.csv";
         betaFilename=outputDirectory+"beta.csv";
+        VLBFilename=outputDirectory+"variationalLowerBound.csv";
         wordListFilename=outputDirectory+"wordList.csv";
     }
 
@@ -107,31 +110,40 @@ int main(int argc, char *argv[]){
     cout<<"wordListFilename="<<wordListFilename<<endl;
     //}}}
 
-//サンプリング{{{
-
-    vector<unsigned int> nThIterationSample;
-    for(int i=0;i<((S-burnIn)/samplingInterval);i++){
-        nThIterationSample.push_back(burnIn+samplingInterval*i);
+//estimation{{{
+    if(learningAlgorythmFlag == 2){
+        VariationalBayesEstimatorOnLDA *estimator;
+        estimator = new VariationalBayesEstimatorOnLDA(bagOfWordsNum,parser.getWordList(),K,V);
+        estimator->runIteraions();
+        estimator->writeParameter(thetaFilename,phiFilename,alphaFilename,betaFilename);
+        estimator->writeVariationalLowerBound(VLBFilename);
+        estimator->printTopFactor(numOfTopFactor);
+        delete estimator;
+    }else{
+        vector<unsigned int> nThIterationSample;
+        for(int i=0;i<((S-burnIn)/samplingInterval);i++){
+            nThIterationSample.push_back(burnIn+samplingInterval*i);
+        }
+        // shared_ptr<GibbsSamplerFromLDA> gibbsSampler;
+        GibbsSamplerFromLDA *gibbsSampler;
+        switch(learningAlgorythmFlag){
+            case 0:
+                // gibbsSampler=make_shared<OrdinaryGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
+                gibbsSampler=new OrdinaryGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
+                break;
+            case 1:
+                // gibbsSampler=make_shared<CollapsedGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
+                gibbsSampler=new CollapsedGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
+                break;
+        }
+        for(int s=0;s<S;s++){
+            gibbsSampler->runIteraion();
+        }
+        gibbsSampler->computeParameter();
+        gibbsSampler->writeParameter(thetaFilename,phiFilename,alphaFilename,betaFilename);
+        gibbsSampler->printTopFactor(numOfTopFactor);
+        delete gibbsSampler;
     }
-    // shared_ptr<GibbsSamplerFromLDA> gibbsSampler;
-    GibbsSamplerFromLDA *gibbsSampler;
-    switch(learningAlgorythmFlag){
-        case 0:
-            // gibbsSampler=make_shared<OrdinaryGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
-            gibbsSampler=new OrdinaryGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
-            break;
-        case 1:
-            // gibbsSampler=make_shared<CollapsedGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
-            gibbsSampler=new CollapsedGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
-            break;
-    }
-    for(int s=0;s<S;s++){
-        gibbsSampler->runIteraion();
-    }
-    gibbsSampler->computeParameter();
-    gibbsSampler->writeParameter(thetaFilename,phiFilename,alphaFilename,betaFilename);
-    gibbsSampler->printTopFactor(numOfTopFactor);
-    delete gibbsSampler;
 //}}}
     return 0;
 }

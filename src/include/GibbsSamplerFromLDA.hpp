@@ -102,6 +102,7 @@ void BaseGibbsSampler<MODEL>::hyperParamUpdate(){//{{{
         }
         _model->alpha[k]=numerator/denominator;
     }
+
     double betaUpdated;
     numerator=0;
     denominator=0;

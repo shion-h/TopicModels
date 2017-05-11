@@ -69,7 +69,6 @@ void LDA::calculateEx(){//{{{
             phiEx[k][v]=(vocaCountsFromTopic[k][v]+beta[v])/(topicCounts[k]+betaSum);
         }
     }
-
 }//}}}
 
 void LDA::calculateHyperParamSum(){//{{{
@@ -83,31 +82,11 @@ void LDA::nUpdate(){//{{{
     topicCounts.assign(K,0);
     for(int d=0;d<topicCountsInDoc.size();d++)topicCountsInDoc[d].assign(K,0);
     for(int k=0;k<vocaCountsFromTopic.size();k++)vocaCountsFromTopic[k].assign(V,0);
-    // for(int k=0;k<K;k++){
-    //     topicCounts[k]=0;
-    // }
-    // for(int d=0;d<z.size();d++){
-    //     for(int k=0;k<K;k++){
-    //         topicCountsInDoc[d][k]=0;
-    //     }
-    // }
-    // for(int k=0;k<K;k++){
-    //     for(int v=0;v<V;v++){
-    //         vocaCountsFromTopic[k][v]=0;
-    //     }
-    // }
-
     for(int d=0;d<z.size();d++){
         for(int i=0;i<z[d].size();i++){
             topicCountsInDoc[d][z[d][i]]++;
         }
     }
-    // for(int d=0;d<z.size();d++){
-    //     for(int k=0;k<K;k++){
-    //         cout<<k<<' '<<topicCountsInDoc[d][k]<<' ';
-    //     }
-    //     cout<<endl;
-    // }
     for(int d=0;d<z.size();d++){
         for(int i=0;i<z[d].size();i++){
             vocaCountsFromTopic[z[d][i]][bagOfWordsNum[d][i]]++;
