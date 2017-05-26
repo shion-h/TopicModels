@@ -125,11 +125,6 @@ vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsig
     double Zq = 0;
     for(int k=0; k<K; k++){
         double numerator=0,denominator=0;
-        // cout<<boost::math::digamma(nkv[k][bagOfWordsNum[d][i]]+beta[bagOfWordsNum[d][i]])<<endl;
-        // cout<<boost::math::digamma(ndk[d][k]+alpha[k])<<endl;
-        //
-        // cout<<boost::math::digamma(nk[k])+betaSum<<endl;
-        // cout<<boost::math::digamma(nd[d]+alphaSum)<<endl<<endl;
         numerator = exp(boost::math::digamma(nkv[k][bagOfWordsNum[d][i]]+beta[bagOfWordsNum[d][i]])) * exp(boost::math::digamma(ndk[d][k]+alpha[k]));
         denominator = exp(boost::math::digamma(nk[k])+betaSum) * exp(boost::math::digamma(nd[d]+alphaSum));
         double constProbability = numerator / denominator;
@@ -138,9 +133,7 @@ vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsig
     }
     for(int k=0; k<K; k++){
         qzdi[k] /= Zq;
-        // cout<<qzdi[k]<<' ';
     }
-        // cout<<endl;
     return(qzdi);
 }//}}}
 
@@ -148,6 +141,7 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
     vector<vector<double> > nkvBuf(nkv.size()), ndkBuf(ndk.size());
     for(int k=0;k<nkv.size();k++)nkvBuf[k].assign(V,0);
     for(int d=0;d<ndk.size();d++)ndkBuf[d].assign(K,0);
+    _variationalLowerBoundOfQz = 0;
     for(int d=0;d<bagOfWordsNum.size();d++){
         for(int i=0;i<bagOfWordsNum[d].size();i++){
             vector<double> qzdi;
@@ -157,6 +151,7 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
             for(int k=0; k<K; k++){
                 ndkBuf[d][k] += qzdi[k];
                 nkvBuf[k][bagOfWordsNum[d][i]] += qzdi[k];
+                _variationalLowerBoundOfQz = qzdi[k] * log(qzdi[k]);
                 // cout<<qzdi[k]<<endl;
             }
         }
@@ -220,24 +215,18 @@ void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
 double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound(){//{{{
     double term1=0, term2=0;
     for(int k=0; k<K; k++){
-        // cout<<betaSum<<endl;
-        // cout<<nk[k]+betaSum<<endl;
-        // cout<<boost::math::lgamma(betaSum)<<endl;
-        // cout<<boost::math::lgamma(nk[k]+betaSum)<<endl;
         term1 += boost::math::lgamma(betaSum) - boost::math::lgamma(nk[k]+betaSum);
         for(int v=0; v<V; v++){
             term1 += boost::math::lgamma(nkv[k][v]+beta[v]) - boost::math::lgamma(beta[v]);
         }
     }
     for(int d=0; d<bagOfWordsNum.size(); d++){
-        // cout<<boost::math::tgamma(alphaSum)/boost::math::tgamma(nd[d]+alphaSum)<<endl;
         term2 += boost::math::lgamma(alphaSum) - boost::math::lgamma(nd[d]+alphaSum);
         for(int k=0; k<K; k++){
             term2 += boost::math::lgamma(ndk[d][k]+alpha[k]) - boost::math::lgamma(alpha[k]);
         }
     }
-    // cout<<term1<<' '<<term2<<endl;
-    double variationalLowerBound = term1 + term2;
+    double variationalLowerBound = term1 + term2 - _variationalLowerBoundOfQz;
     return(variationalLowerBound);
 }//}}}
 
@@ -459,12 +448,12 @@ void VariationalBayesEstimatorOnLDA::writePhiEx(string phiFilename)const{//{{{
     }
 }//}}}
 
-void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilename)const{
+void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilename)const{//{{{
     ofstream VLBOutput;
     VLBOutput.open(VLBFilename,ios::out);
     VLBOutput<<_variationalLowerBound<<endl;
     VLBOutput.close();
-}
+}//}}}
 
 void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
     double prevVariationalLowerBound = 1;

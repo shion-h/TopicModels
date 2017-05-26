@@ -35,6 +35,7 @@ protected:
     vector<double> nd, nk;
     vector<vector<double> > ndk, nkv;
     const vector<string> &_wordList;
+    double _variationalLowerBoundOfQz;
     double _variationalLowerBound;
 public:
     VariationalBayesEstimatorOnLDA(const vector<vector<unsigned int > > &bagOfWordsNum,const vector<string > &wordList,const unsigned int K,const unsigned int V);
