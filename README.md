@@ -56,11 +56,9 @@ positional arguments:
   
 optional arguments:  
   -h, --help            show this help message and exit  
-  -s KSTEP, --kstep KSTEP  
-                        step number of topics for calculation of perplexity  
+  -s KSTEP, --kstep KSTEP step number of topics for calculation of perplexity  
   -r RATE, --rate RATE  rate of train data  
-  -i ITERATION, --iteration ITERATION  
-                        number of iterations(>10)  
+  -i ITERATION, --iteration ITERATION number of iterations(>10)  
   
 calcldawbic.py [-h] [-s KSTEP] [-i ITERATION] BOW_filename k_min k_max  
   
@@ -71,25 +69,19 @@ positional arguments:
   
 optional arguments:  
   -h, --help            show this help message and exit  
-  -s KSTEP, --kstep KSTEP  
-                        step number of topics for calculation of wbic  
-  -i ITERATION, --iteration ITERATION  
-                        number of iterations(>10)  
+  -s KSTEP, --kstep KSTEP step number of topics for calculation of wbic  
+  -i ITERATION, --iteration ITERATION number of iterations(>10)  
   
 calcldavlb.py [-h] [-s KSTEP] BOW_filename k_min k_max  
   
 positional arguments:  
   BOW_filename          Bag Of Words filename  
-  k_min                 minimum number of topics for calculation of maximized  
-                        variational lower bound  
-  k_max                 max number of topics for calculation of maximized  
-                        variational lower bound  
+  k_min                 minimum number of topics for calculation of maximized variational lower bound  
+  k_max                 max number of topics for calculation of maximized variational lower bound  
   
 optional arguments:  
   -h, --help            show this help message and exit  
-  -s KSTEP, --kstep KSTEP  
-                        step number of topics for calculation of maximized  
-                        variational lower bound  
+  -s KSTEP, --kstep KSTEP step number of topics for calculation of maximized variational lower bound  
 ## Output
 These scripts output results to /output/(time stamp) directory. (time stamp) means date information of MMDD_DAY_hh_mm_ss format.  
 # License
