@@ -152,9 +152,9 @@ class WBICCalculator():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("BOW_filename", help="Bag Of Words filename")
-    parser.add_argument("k_min", help="minimum number of topics for calculation of perplexity", type=int)
-    parser.add_argument("k_max", help="max number of topics for calculation of perplexity", type=int)
-    parser.add_argument("-s", "--kstep", help="step number of topics for calculation of perplexity", type=int, default=1)
+    parser.add_argument("k_min", help="minimum number of topics for calculation of wbic", type=int)
+    parser.add_argument("k_max", help="max number of topics for calculation of wbic", type=int)
+    parser.add_argument("-s", "--kstep", help="step number of topics for calculation of wbic", type=int, default=1)
     parser.add_argument("-i", "--iteration", help="number of iterations(>10)", default=100)
     args = parser.parse_args()
     calculator = WBICCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.iteration)
