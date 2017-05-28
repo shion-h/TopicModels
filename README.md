@@ -9,7 +9,7 @@ You should install boost library for using this tools.
 
 If you also use scripts, you should install miniconda.  
 After installation of it, you should execute following commands.  
-`conda install numpy, scipy, pandas`  
+`conda install numpy scipy pandas`  
 # Usage
 ## Latent Dirichlet Allocation
  LDA [BOW file] [-options]  
