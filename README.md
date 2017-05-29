@@ -1,6 +1,6 @@
 # TopicModels
 # Abstract
-This tools can estimate parameters(includes hyper parameters) of some topic models.  
+This tools can estimate parameters(including hyper parameters) of some topic models.  
 # Installation
     ./configure
     make
