@@ -128,7 +128,8 @@ class WBICCalculator():
                                             lda_directory_path, output_dir,
                                             self.BOW_filename)
             subprocess.call(command.split(' '),
-                            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.STDOUT)
 
     def calculate_WBIC_each_topic_num(self):
         BOW, _ = make_bag_of_words_num(self.BOW_filename)
@@ -143,10 +144,25 @@ class WBICCalculator():
             WBIC = run_WBIC_metropolis(BOW, alpha, beta, words_num)
             print('{0},{1}'.format(topic_num, WBIC))
 
+    def calculate_WBIC_each_topic_num_C(self):
+        BOW, _ = make_bag_of_words_num(self.BOW_filename)
+        words_num = 0
+        for document in BOW:
+            words_num += len(document)
+        for topic_num in range(self.k_min, self.k_max, self.kstep):
+            command = lda_directory_path + "/src/LDAWBIC " + \
+                      self.BOW_filename + ' ' + lda_directory_path + \
+                      '/output/' + timestamp+'/K_' + str(topic_num) + \
+                      '/alpha.csv ' + lda_directory_path + '/output/' + \
+                      timestamp+'/K_' + str(topic_num) + '/beta.csv'
+            # print(command)
+            subprocess.call(command.split(' '))
+
     def run(self):
         self.execute_estimation()
         print('\nestimate done')
-        self.calculate_WBIC_each_topic_num()
+        # self.calculate_WBIC_each_topic_num()
+        self.calculate_WBIC_each_topic_num_C()
 
 
 if __name__ == '__main__':

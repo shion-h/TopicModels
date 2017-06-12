@@ -86,7 +86,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = LDA$(EXEEXT) ATM$(EXEEXT)
+bin_PROGRAMS = LDA$(EXEEXT) ATM$(EXEEXT) LDAWBIC$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -114,6 +114,11 @@ am_LDA_OBJECTS = LDA-BOWFileParser.$(OBJEXT) \
 LDA_OBJECTS = $(am_LDA_OBJECTS)
 LDA_LDADD = $(LDADD)
 LDA_LINK = $(CXXLD) $(LDA_CXXFLAGS) $(CXXFLAGS) $(LDA_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_LDAWBIC_OBJECTS = LDAWBIC-LDAWBICMetropolisSampler.$(OBJEXT)
+LDAWBIC_OBJECTS = $(am_LDAWBIC_OBJECTS)
+LDAWBIC_DEPENDENCIES = LDA-BOWFileParser.o
+LDAWBIC_LINK = $(CXXLD) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -160,8 +165,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(ATM_SOURCES) $(LDA_SOURCES)
-DIST_SOURCES = $(ATM_SOURCES) $(LDA_SOURCES)
+SOURCES = $(ATM_SOURCES) $(LDA_SOURCES) $(LDAWBIC_SOURCES)
+DIST_SOURCES = $(ATM_SOURCES) $(LDA_SOURCES) $(LDAWBIC_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -287,6 +292,9 @@ ATM_SOURCES = CollapsedGibbsSamplerFromATM.cpp include/CollapsedGibbsSamplerFrom
 ATM_CXXFLAGS = -std=c++11
 ATM_LDFLAGS = -lboost_program_options
 ATM_LDADD = LDA-BOWFileParser.o LDA-GibbsSamplerFromLDA.o
+LDAWBIC_SOURCES = LDAWBICMetropolisSampler.cpp include/LDAWBICMetropolisSampler.hpp
+LDAWBIC_CXXFLAGS = -std=c++11
+LDAWBIC_LDADD = LDA-BOWFileParser.o
 all: all-am
 
 .SUFFIXES:
@@ -371,6 +379,10 @@ LDA$(EXEEXT): $(LDA_OBJECTS) $(LDA_DEPENDENCIES) $(EXTRA_LDA_DEPENDENCIES)
 	@rm -f LDA$(EXEEXT)
 	$(AM_V_CXXLD)$(LDA_LINK) $(LDA_OBJECTS) $(LDA_LDADD) $(LIBS)
 
+LDAWBIC$(EXEEXT): $(LDAWBIC_OBJECTS) $(LDAWBIC_DEPENDENCIES) $(EXTRA_LDAWBIC_DEPENDENCIES) 
+	@rm -f LDAWBIC$(EXEEXT)
+	$(AM_V_CXXLD)$(LDAWBIC_LINK) $(LDAWBIC_OBJECTS) $(LDAWBIC_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -387,6 +399,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-LDA.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-OrdinaryGibbsSamplerFromLDA.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-VariationalBayesEstimatorOnLDA.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -541,6 +554,20 @@ LDA-VariationalBayesEstimatorOnLDA.obj: VariationalBayesEstimatorOnLDA.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='VariationalBayesEstimatorOnLDA.cpp' object='LDA-VariationalBayesEstimatorOnLDA.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDA_CXXFLAGS) $(CXXFLAGS) -c -o LDA-VariationalBayesEstimatorOnLDA.obj `if test -f 'VariationalBayesEstimatorOnLDA.cpp'; then $(CYGPATH_W) 'VariationalBayesEstimatorOnLDA.cpp'; else $(CYGPATH_W) '$(srcdir)/VariationalBayesEstimatorOnLDA.cpp'; fi`
+
+LDAWBIC-LDAWBICMetropolisSampler.o: LDAWBICMetropolisSampler.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -MT LDAWBIC-LDAWBICMetropolisSampler.o -MD -MP -MF $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Tpo -c -o LDAWBIC-LDAWBICMetropolisSampler.o `test -f 'LDAWBICMetropolisSampler.cpp' || echo '$(srcdir)/'`LDAWBICMetropolisSampler.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Tpo $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LDAWBICMetropolisSampler.cpp' object='LDAWBIC-LDAWBICMetropolisSampler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -c -o LDAWBIC-LDAWBICMetropolisSampler.o `test -f 'LDAWBICMetropolisSampler.cpp' || echo '$(srcdir)/'`LDAWBICMetropolisSampler.cpp
+
+LDAWBIC-LDAWBICMetropolisSampler.obj: LDAWBICMetropolisSampler.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -MT LDAWBIC-LDAWBICMetropolisSampler.obj -MD -MP -MF $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Tpo -c -o LDAWBIC-LDAWBICMetropolisSampler.obj `if test -f 'LDAWBICMetropolisSampler.cpp'; then $(CYGPATH_W) 'LDAWBICMetropolisSampler.cpp'; else $(CYGPATH_W) '$(srcdir)/LDAWBICMetropolisSampler.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Tpo $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LDAWBICMetropolisSampler.cpp' object='LDAWBIC-LDAWBICMetropolisSampler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -c -o LDAWBIC-LDAWBICMetropolisSampler.obj `if test -f 'LDAWBICMetropolisSampler.cpp'; then $(CYGPATH_W) 'LDAWBICMetropolisSampler.cpp'; else $(CYGPATH_W) '$(srcdir)/LDAWBICMetropolisSampler.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
