@@ -56,10 +56,12 @@ double calculateDirichletLogPdf(vector<double> probVar, vector<double> param){
     double term2 = 0.0, term3 = 0.0;
     for(int i=0; i<p; i++){
         paramSum += param[i];
-        term2 += log(boost::math::lgamma(param[i]));
+        term2 += boost::math::lgamma(param[i]);
         term3 += (param[i]-1) * log(probVar[i]);
     }
-    pdf += log(boost::math::lgamma(paramSum));
+    // cout<<param[0]<<' '<<boost::math::lgamma(param[0])<<' ';
+    // cout<<(param[0]-1) * log(probVar[0])<<endl;
+    pdf += boost::math::lgamma(paramSum);
     pdf += -term2;
     pdf += term3;
     return pdf;
@@ -71,6 +73,7 @@ double calculateLogPriorValue(const vector<vector<double> > &theta, const vector
     for(int d=0; d<theta.size(); d++){
         logPriorValue += calculateDirichletLogPdf(theta[d], alpha);
     }
+        // cout<<"thetapdf:"<<calculateDirichletLogPdf(theta[0], alpha)<<endl;
     for(int k=0; k<phi.size(); k++){
         logPriorValue += calculateDirichletLogPdf(phi[k], beta);
     }
@@ -85,15 +88,16 @@ double calculateTargetDistributionValue(const double &logLikelihood, const doubl
 }
 
 
-vector<vector<double> > samplingParamFromDirichlet(const vector<double> &param, const unsigned int &N){
-    unsigned int p = param.size();
+vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> > &param, const unsigned int &N){
+    // unsigned int N = param.size();
+    unsigned int p = param[0].size();
     vector<vector<double> > ret(N);
     for(int n=0;n<ret.size();n++)ret[n].assign(p,0);
     random_device rnd;
     for(int n=0; n<N; n++){
         vector<double> sample;
         for(int i=0; i<p; i++){
-            gamma_distribution<double> gamma(param[i],1);
+            gamma_distribution<double> gamma(param[n][i],1);
             sample.push_back(gamma(rnd));
         }
         double sampleSum=accumulate(sample.begin(),sample.end(), 0.0);
@@ -106,34 +110,75 @@ vector<vector<double> > samplingParamFromDirichlet(const vector<double> &param, 
 
 
 double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n=0){
-    unsigned int D=BOW.size(), K=alpha.size();
+    unsigned int D=BOW.size(), K=alpha.size(), V=beta.size();
     if(n==0){
         for(int d=0; d<D; d++){
             n += BOW[d].size();
         }
     }
+    vector<vector<double> > alphaCandidate(D, alpha);
+    vector<vector<double> > betaCandidate(K, beta);
     unsigned int iteration = 1000;
     unsigned int burnIn = 800;
-    unsigned int samplingInterval = 1;
+    unsigned int samplingInterval = 5;
+    const unsigned int RATE = 50;
     unsigned int samplingTimes = (iteration - burnIn) / samplingInterval;
     unsigned int acceptanceTimes = 0;
     double logLikelihoodAverage = 0.0;
-    vector<vector<double> > theta = samplingParamFromDirichlet(alpha, D);
-    vector<vector<double> > phi = samplingParamFromDirichlet(beta, K);
+    vector<vector<double> > theta = samplingParamFromDirichlet(alphaCandidate, D);
+    vector<vector<double> > phi = samplingParamFromDirichlet(betaCandidate, K);
+        // cout<<"theta:";
+        // for(int k=0; k<theta[0].size(); k++){
+        //     cout<<theta[0][k]<<' ';
+        // }
+        // cout<<endl;
     double logLikelihood = calculateLogLikelihood(theta, phi, BOW);
     double logPriorValue = calculateLogPriorValue(theta, phi, alpha, beta);
     double targetDistValue = calculateTargetDistributionValue(logLikelihood, logPriorValue, n);
     random_device rnd;
     mt19937 mt(rnd());
     uniform_real_distribution<double> randN(0,1);
+    const unsigned int alphaSum = RATE * K;
+    const unsigned int betaSum = RATE * V;
     for(int i=0; i<iteration; i++){
-        vector<vector<double> > thetaCandidate = samplingParamFromDirichlet(alpha, D);
-        vector<vector<double> > phiCandidate = samplingParamFromDirichlet(beta, K);
+        for(int d=0; d<D; d++){
+            for(int k=0; k<K; k++){
+                alphaCandidate[d][k] = theta[d][k] * (alphaSum - K) + 1;
+            }
+        }
+        for(int k=0; k<K; k++){
+            for(int v=0; v<V; v++){
+                betaCandidate[k][v] = phi[k][v] * (betaSum - V) + 1;
+            }
+        }
+        vector<vector<double> > thetaCandidate = samplingParamFromDirichlet(alphaCandidate, D);
+        vector<vector<double> > phiCandidate = samplingParamFromDirichlet(betaCandidate, K);
         double logLikelihoodCandidate = calculateLogLikelihood(thetaCandidate, phiCandidate, BOW);
         double logPriorValueCandidate = calculateLogPriorValue(thetaCandidate, phiCandidate, alpha, beta);
         double targetDistValueCandidate = calculateTargetDistributionValue(logLikelihoodCandidate, logPriorValueCandidate, n);
         double acceptanceProb = exp(targetDistValueCandidate - targetDistValue + logPriorValue - logPriorValueCandidate);
+        // cout<<targetDistValueCandidate<<' ';
+        // cout<<targetDistValue<<' ';
+        // cout<<logPriorValue<<' ';
+        // cout<<logPriorValueCandidate<<endl;
         double randomValue = randN(mt);
+        // cout<<"theta:";
+        // for(int k=0; k<theta[0].size(); k++){
+        //     cout<<thetaCandidate[0][k]<<' ';
+        // }
+        // cout<<endl;
+        // cout<<"phi:";
+        // for(int v=0; v<phi[0].size(); v++){
+        //     cout<<phi[0][v]<<' ';
+        // }
+        // cout<<endl;
+        // cout<<"phi:";
+        // for(int v=0; v<phi[0].size(); v++){
+        //     cout<<phiCandidate[0][v]<<' ';
+        // }
+        // cout<<endl;
+        // cout<<"ac_pro:"<<acceptanceProb<<endl;
+        // cout<<logLikelihood<<endl;
         if(acceptanceProb > randomValue){
             acceptanceTimes += 1;
             theta = thetaCandidate;
@@ -148,8 +193,6 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
     }
     logLikelihoodAverage /= samplingTimes;
     cout<<"acceptanceTimes: "<<acceptanceTimes<<endl;
-    /*
-    */
     return logLikelihoodAverage;
 }
 

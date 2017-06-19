@@ -35,11 +35,11 @@ int main(int argc, char *argv[]){
     ;
 
     boost::program_options::positional_options_description pd;
-    pd.add("BOWfile",1);
+    pd.add("BOWfile", 1);
 
     boost::program_options::options_description hidden("hidden");
     hidden.add_options()
-        ("BOWfile",boost::program_options::value<string>(), "hidden")
+        ("BOWfile", boost::program_options::value<string>(), "hidden")
         ;
     boost::program_options::options_description cmdline_options;
     cmdline_options.add(opt).add(hidden);
@@ -71,76 +71,76 @@ int main(int argc, char *argv[]){
         cout<<opt<<endl;
         exit(1);
     }else{
-        BOWFilename=vm["BOWfile"].as<std::string>();
-        if(vm.count("nmtp"))K=vm["nmtp"].as<unsigned int>();
-        if(vm.count("nmit"))S=vm["nmit"].as<unsigned int>();
-        if(vm.count("bnin"))burnIn=vm["bnin"].as<unsigned int>();
-        else burnIn=static_cast<int>(S*0.8);
-        if(vm.count("intv"))samplingInterval=vm["intv"].as<unsigned int>();
-        if(vm.count("lrna"))learningAlgorythmFlag=vm["lrna"].as<unsigned int>();
-        if(vm.count("nmsh"))numOfTopFactor=vm["nmsh"].as<unsigned int>();
-        if(vm.count("otpt"))outputDirectory=vm["otpt"].as<std::string>();
+        BOWFilename = vm["BOWfile"].as<std::string>();
+        if(vm.count("nmtp"))K = vm["nmtp"].as<unsigned int>();
+        if(vm.count("nmit"))S = vm["nmit"].as<unsigned int>();
+        if(vm.count("bnin"))burnIn = vm["bnin"].as<unsigned int>();
+        else burnIn = static_cast<int>(S*0.8);
+        if(vm.count("intv"))samplingInterval = vm["intv"].as<unsigned int>();
+        if(vm.count("lrna"))learningAlgorythmFlag = vm["lrna"].as<unsigned int>();
+        if(vm.count("nmsh"))numOfTopFactor = vm["nmsh"].as<unsigned int>();
+        if(vm.count("otpt"))outputDirectory = vm["otpt"].as<std::string>();
         cout<<outputDirectory<<endl;
-        thetaFilename=outputDirectory+"theta.csv";
-        phiFilename=outputDirectory+"phi.csv";
-        alphaFilename=outputDirectory+"alpha.csv";
-        betaFilename=outputDirectory+"beta.csv";
-        VLBFilename=outputDirectory+"variationalLowerBound.csv";
-        wordListFilename=outputDirectory+"wordList.csv";
+        thetaFilename = outputDirectory + "theta.csv";
+        phiFilename = outputDirectory + "phi.csv";
+        alphaFilename = outputDirectory + "alpha.csv";
+        betaFilename = outputDirectory + "beta.csv";
+        VLBFilename = outputDirectory + "variationalLowerBound.csv";
+        wordListFilename = outputDirectory + "wordList.csv";
     }
 
     BOWFileParser parser(BOWFilename);
     parser.readBOWFile();
     parser.makeBagOfWordsNum();
     parser.writeWordList(wordListFilename);
-    unsigned int V=parser.getV();
-    vector<vector<unsigned int> > bagOfWordsNum=parser.getBagOfWordsNum();
+    unsigned int V = parser.getV();
+    vector<vector<unsigned int> > bagOfWordsNum = parser.getBagOfWordsNum();
 
-    cout<<"filename="<<BOWFilename<<' ';
-    cout<<"K="<<K<<' ';
-    cout<<"V="<<V<<' ';
-    cout<<"S="<<S<<' ';
-    cout<<"learningAlgorythmFlag="<<learningAlgorythmFlag<<' ';
-    cout<<"burnIn="<<burnIn<<' ';
-    cout<<"samplingInterval="<<samplingInterval<<' ';
-    cout<<"thetaFilename="<<thetaFilename<<' ';
-    cout<<"phiFilename="<<phiFilename<<' ';
-    cout<<"alphaFilename="<<alphaFilename<<' ';
-    cout<<"betaFilename="<<betaFilename<<' ';
-    cout<<"wordListFilename="<<wordListFilename<<endl;
+    cout<<"filename = "<<BOWFilename<<' ';
+    cout<<"K = "<<K<<' ';
+    cout<<"V = "<<V<<' ';
+    cout<<"S = "<<S<<' ';
+    cout<<"learningAlgorythmFlag = "<<learningAlgorythmFlag<<' ';
+    cout<<"burnIn = "<<burnIn<<' ';
+    cout<<"samplingInterval = "<<samplingInterval<<' ';
+    cout<<"thetaFilename = "<<thetaFilename<<' ';
+    cout<<"phiFilename = "<<phiFilename<<' ';
+    cout<<"alphaFilename = "<<alphaFilename<<' ';
+    cout<<"betaFilename = "<<betaFilename<<' ';
+    cout<<"wordListFilename = "<<wordListFilename<<endl;
     //}}}
 
 //estimation{{{
     if(learningAlgorythmFlag == 2){
         VariationalBayesEstimatorOnLDA *estimator;
-        estimator = new VariationalBayesEstimatorOnLDA(bagOfWordsNum,parser.getWordList(),K,V);
+        estimator = new VariationalBayesEstimatorOnLDA(bagOfWordsNum, parser.getWordList(), K, V);
         estimator->runIteraions();
-        estimator->writeParameter(thetaFilename,phiFilename,alphaFilename,betaFilename);
+        estimator->writeParameter(thetaFilename, phiFilename, alphaFilename, betaFilename);
         estimator->writeVariationalLowerBound(VLBFilename);
         estimator->printTopFactor(numOfTopFactor);
         delete estimator;
     }else{
         vector<unsigned int> nThIterationSample;
-        for(int i=0;i<((S-burnIn)/samplingInterval);i++){
-            nThIterationSample.push_back(burnIn+samplingInterval*i);
+        for(int i=0;i < ((S-burnIn)/samplingInterval);i++){
+            nThIterationSample.push_back(burnIn + samplingInterval*i);
         }
         // shared_ptr<GibbsSamplerFromLDA> gibbsSampler;
         GibbsSamplerFromLDA *gibbsSampler;
         switch(learningAlgorythmFlag){
             case 0:
-                // gibbsSampler=make_shared<OrdinaryGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
-                gibbsSampler=new OrdinaryGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
+                // gibbsSampler = make_shared<OrdinaryGibbsSamplerFromLDA>(bagOfWordsNum, K, V, nThIterationSample);
+                gibbsSampler = new OrdinaryGibbsSamplerFromLDA(bagOfWordsNum, parser.getWordList(), K, V, nThIterationSample);
                 break;
             case 1:
-                // gibbsSampler=make_shared<CollapsedGibbsSamplerFromLDA>(bagOfWordsNum,K,V,nThIterationSample);
-                gibbsSampler=new CollapsedGibbsSamplerFromLDA(bagOfWordsNum,parser.getWordList(),K,V,nThIterationSample);
+                // gibbsSampler = make_shared<CollapsedGibbsSamplerFromLDA>(bagOfWordsNum, K, V, nThIterationSample);
+                gibbsSampler = new CollapsedGibbsSamplerFromLDA(bagOfWordsNum, parser.getWordList(), K, V, nThIterationSample);
                 break;
         }
         for(int s=0;s<S;s++){
             gibbsSampler->runIteraion();
         }
         gibbsSampler->computeParameter();
-        gibbsSampler->writeParameter(thetaFilename,phiFilename,alphaFilename,betaFilename);
+        gibbsSampler->writeParameter(thetaFilename, phiFilename, alphaFilename, betaFilename);
         gibbsSampler->printTopFactor(numOfTopFactor);
         delete gibbsSampler;
     }

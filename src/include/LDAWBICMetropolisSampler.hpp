@@ -33,7 +33,7 @@ double calculateLogPriorValue(const vector<vector<double> > &theta, const vector
 double calculateTargetDistributionValue(const double &logLikelihood, const double &logPriorValue, const unsigned int &n);
 
 
-vector<vector<double> > samplingParamFromDirichlet(const vector<double> &param, const unsigned int &N);
+vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> > &param, const unsigned int &N);
 
 
 double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n);

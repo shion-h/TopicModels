@@ -22,7 +22,7 @@ import pandas as pd
 
 
 def create_command_string(topic_num, iteration, lda_directory_path, output_dir, BOW_filename, algorythm_flag=1):
-    command = lda_directory_path + '/src/LDA ' + BOW_filename
+    command = lda_directory_path + '/bin/LDA ' + BOW_filename
     command += (' -k '+str(topic_num))
     command += (' -s '+str(iteration))
     command += (' -b '+str(int(iteration*0.8)))
