@@ -6,6 +6,6 @@ ATM_SOURCES = CollapsedGibbsSamplerFromATM.cpp include/CollapsedGibbsSamplerFrom
 ATM_CXXFLAGS = -std=c++11
 ATM_LDFLAGS = -lboost_program_options
 ATM_LDADD = LDA-BOWFileParser.o LDA-GibbsSamplerFromLDA.o
-LDAWBIC_SOURCES = LDAWBICMetropolisSampler.cpp include/LDAWBICMetropolisSampler.hpp
+LDAWBIC_SOURCES = LDAWBIC.cpp LDAWBICMetropolisSampler.cpp include/LDAWBICMetropolisSampler.hpp
 LDAWBIC_CXXFLAGS = -std=c++11
 LDAWBIC_LDADD = LDA-BOWFileParser.o

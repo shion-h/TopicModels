@@ -21,8 +21,6 @@ BOWFileParser::~BOWFileParser(){//{{{
 }//}}}
 
 void BOWFileParser::readBOWFile(){//{{{
-    string buf;
-
     if(!_inputText){
         cout<<"Can't open BOWfile";
         exit(1);

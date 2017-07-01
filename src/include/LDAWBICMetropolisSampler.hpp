@@ -10,7 +10,7 @@
 #include<random>
 #include<math.h>
 #include <boost/math/special_functions/gamma.hpp>
-#include "include/BOWFileParser.hpp"
+#include "BOWFileParser.hpp"
 // #include <boost/python.hpp>
 // #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -36,6 +36,6 @@ double calculateTargetDistributionValue(const double &logLikelihood, const doubl
 vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> > &param, const unsigned int &N);
 
 
-double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n);
+double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n=0);
 
 vector<double> readHyperParam(string hyperParamFilename);

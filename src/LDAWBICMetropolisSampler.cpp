@@ -7,10 +7,6 @@
 // http://opensource.org/licenses/mit-license.php
 //
 
-#include<random>
-#include<math.h>
-#include <boost/math/special_functions/gamma.hpp>
-#include "include/BOWFileParser.hpp"
 #include "include/LDAWBICMetropolisSampler.hpp"
 // #include <boost/python.hpp>
 // #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -109,7 +105,7 @@ vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> >
 }
 
 
-double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n=0){
+double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n){
     unsigned int D=BOW.size(), K=alpha.size(), V=beta.size();
     if(n==0){
         for(int d=0; d<D; d++){
@@ -217,20 +213,6 @@ vector<double> readHyperParam(string hyperParamFilename){
 }
 
 
-int main(int argc, char *argv[]){
-    BOWFileParser parser(argv[1]);
-    parser.readBOWFile();
-    parser.makeBagOfWordsNum();
-    vector<vector<unsigned int> > BOW = parser.getBagOfWordsNum();
-    vector<double> alpha = readHyperParam(argv[2]);
-    vector<double> beta = readHyperParam(argv[3]);
-    unsigned int n;
-    if(argc == 5){
-        n = atoi(argv[4]);
-    }
-    cout<<runWBICMetropolis(BOW, alpha, beta)<<endl;
-    return 0;
-}
 //
 //
 // BOOST_PYTHON_MODULE(WBICMetropolisSampler){
