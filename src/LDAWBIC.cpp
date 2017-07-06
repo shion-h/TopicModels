@@ -19,6 +19,6 @@ int main(int argc, char *argv[]){
     if(argc == 5){
         n = atoi(argv[4]);
     }
-    cout<<runWBICMetropolis(BOW, alpha, beta)<<endl;
+    cout<<alpha.size()<<','<<runWBICMetropolis(BOW, alpha, beta)<<endl;
     return 0;
 }

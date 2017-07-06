@@ -115,7 +115,8 @@ LDA_OBJECTS = $(am_LDA_OBJECTS)
 LDA_LDADD = $(LDADD)
 LDA_LINK = $(CXXLD) $(LDA_CXXFLAGS) $(CXXFLAGS) $(LDA_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_LDAWBIC_OBJECTS = LDAWBIC-LDAWBICMetropolisSampler.$(OBJEXT)
+am_LDAWBIC_OBJECTS = LDAWBIC-LDAWBIC.$(OBJEXT) \
+	LDAWBIC-LDAWBICMetropolisSampler.$(OBJEXT)
 LDAWBIC_OBJECTS = $(am_LDAWBIC_OBJECTS)
 LDAWBIC_DEPENDENCIES = LDA-BOWFileParser.o
 LDAWBIC_LINK = $(CXXLD) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -292,7 +293,7 @@ ATM_SOURCES = CollapsedGibbsSamplerFromATM.cpp include/CollapsedGibbsSamplerFrom
 ATM_CXXFLAGS = -std=c++11
 ATM_LDFLAGS = -lboost_program_options
 ATM_LDADD = LDA-BOWFileParser.o LDA-GibbsSamplerFromLDA.o
-LDAWBIC_SOURCES = LDAWBICMetropolisSampler.cpp include/LDAWBICMetropolisSampler.hpp
+LDAWBIC_SOURCES = LDAWBIC.cpp LDAWBICMetropolisSampler.cpp include/LDAWBICMetropolisSampler.hpp
 LDAWBIC_CXXFLAGS = -std=c++11
 LDAWBIC_LDADD = LDA-BOWFileParser.o
 all: all-am
@@ -399,6 +400,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-LDA.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-OrdinaryGibbsSamplerFromLDA.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDA-VariationalBayesEstimatorOnLDA.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDAWBIC-LDAWBIC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Po@am__quote@
 
 .cpp.o:
@@ -554,6 +556,20 @@ LDA-VariationalBayesEstimatorOnLDA.obj: VariationalBayesEstimatorOnLDA.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='VariationalBayesEstimatorOnLDA.cpp' object='LDA-VariationalBayesEstimatorOnLDA.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDA_CXXFLAGS) $(CXXFLAGS) -c -o LDA-VariationalBayesEstimatorOnLDA.obj `if test -f 'VariationalBayesEstimatorOnLDA.cpp'; then $(CYGPATH_W) 'VariationalBayesEstimatorOnLDA.cpp'; else $(CYGPATH_W) '$(srcdir)/VariationalBayesEstimatorOnLDA.cpp'; fi`
+
+LDAWBIC-LDAWBIC.o: LDAWBIC.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -MT LDAWBIC-LDAWBIC.o -MD -MP -MF $(DEPDIR)/LDAWBIC-LDAWBIC.Tpo -c -o LDAWBIC-LDAWBIC.o `test -f 'LDAWBIC.cpp' || echo '$(srcdir)/'`LDAWBIC.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/LDAWBIC-LDAWBIC.Tpo $(DEPDIR)/LDAWBIC-LDAWBIC.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LDAWBIC.cpp' object='LDAWBIC-LDAWBIC.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -c -o LDAWBIC-LDAWBIC.o `test -f 'LDAWBIC.cpp' || echo '$(srcdir)/'`LDAWBIC.cpp
+
+LDAWBIC-LDAWBIC.obj: LDAWBIC.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -MT LDAWBIC-LDAWBIC.obj -MD -MP -MF $(DEPDIR)/LDAWBIC-LDAWBIC.Tpo -c -o LDAWBIC-LDAWBIC.obj `if test -f 'LDAWBIC.cpp'; then $(CYGPATH_W) 'LDAWBIC.cpp'; else $(CYGPATH_W) '$(srcdir)/LDAWBIC.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/LDAWBIC-LDAWBIC.Tpo $(DEPDIR)/LDAWBIC-LDAWBIC.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LDAWBIC.cpp' object='LDAWBIC-LDAWBIC.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -c -o LDAWBIC-LDAWBIC.obj `if test -f 'LDAWBIC.cpp'; then $(CYGPATH_W) 'LDAWBIC.cpp'; else $(CYGPATH_W) '$(srcdir)/LDAWBIC.cpp'; fi`
 
 LDAWBIC-LDAWBICMetropolisSampler.o: LDAWBICMetropolisSampler.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(LDAWBIC_CXXFLAGS) $(CXXFLAGS) -MT LDAWBIC-LDAWBICMetropolisSampler.o -MD -MP -MF $(DEPDIR)/LDAWBIC-LDAWBICMetropolisSampler.Tpo -c -o LDAWBIC-LDAWBICMetropolisSampler.o `test -f 'LDAWBICMetropolisSampler.cpp' || echo '$(srcdir)/'`LDAWBICMetropolisSampler.cpp

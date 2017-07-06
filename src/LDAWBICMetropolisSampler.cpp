@@ -114,20 +114,15 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
     }
     vector<vector<double> > alphaCandidate(D, alpha);
     vector<vector<double> > betaCandidate(K, beta);
-    unsigned int iteration = 1000;
-    unsigned int burnIn = 800;
-    unsigned int samplingInterval = 5;
+    unsigned int iteration = 60000;
+    unsigned int burnIn = 50000;
+    unsigned int samplingInterval = 100;
     const unsigned int RATE = 50;
     unsigned int samplingTimes = (iteration - burnIn) / samplingInterval;
     unsigned int acceptanceTimes = 0;
     double logLikelihoodAverage = 0.0;
     vector<vector<double> > theta = samplingParamFromDirichlet(alphaCandidate, D);
     vector<vector<double> > phi = samplingParamFromDirichlet(betaCandidate, K);
-        // cout<<"theta:";
-        // for(int k=0; k<theta[0].size(); k++){
-        //     cout<<theta[0][k]<<' ';
-        // }
-        // cout<<endl;
     double logLikelihood = calculateLogLikelihood(theta, phi, BOW);
     double logPriorValue = calculateLogPriorValue(theta, phi, alpha, beta);
     double targetDistValue = calculateTargetDistributionValue(logLikelihood, logPriorValue, n);
@@ -153,28 +148,7 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
         double logPriorValueCandidate = calculateLogPriorValue(thetaCandidate, phiCandidate, alpha, beta);
         double targetDistValueCandidate = calculateTargetDistributionValue(logLikelihoodCandidate, logPriorValueCandidate, n);
         double acceptanceProb = exp(targetDistValueCandidate - targetDistValue + logPriorValue - logPriorValueCandidate);
-        // cout<<targetDistValueCandidate<<' ';
-        // cout<<targetDistValue<<' ';
-        // cout<<logPriorValue<<' ';
-        // cout<<logPriorValueCandidate<<endl;
         double randomValue = randN(mt);
-        // cout<<"theta:";
-        // for(int k=0; k<theta[0].size(); k++){
-        //     cout<<thetaCandidate[0][k]<<' ';
-        // }
-        // cout<<endl;
-        // cout<<"phi:";
-        // for(int v=0; v<phi[0].size(); v++){
-        //     cout<<phi[0][v]<<' ';
-        // }
-        // cout<<endl;
-        // cout<<"phi:";
-        // for(int v=0; v<phi[0].size(); v++){
-        //     cout<<phiCandidate[0][v]<<' ';
-        // }
-        // cout<<endl;
-        // cout<<"ac_pro:"<<acceptanceProb<<endl;
-        // cout<<logLikelihood<<endl;
         if(acceptanceProb > randomValue){
             acceptanceTimes += 1;
             theta = thetaCandidate;
@@ -186,6 +160,7 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
         if((i > burnIn-1) && (i-burnIn+1)%samplingInterval == 0){
             logLikelihoodAverage += logLikelihood;
         }
+        cout<<logLikelihood<<endl;
     }
     logLikelihoodAverage /= samplingTimes;
     cout<<"acceptanceTimes: "<<acceptanceTimes<<endl;
