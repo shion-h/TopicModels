@@ -64,23 +64,36 @@ double calculateDirichletLogPdf(vector<double> probVar, vector<double> param){
 }
 
 
-double calculateLogPriorValue(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<double> alpha, const vector<double> beta){
-    double logPriorValue = 0.0;
+double calculateLogPriorDistributionValue(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<double> alpha, const vector<double> beta){
+    double logPriorDistributionValue = 0.0;
     for(int d=0; d<theta.size(); d++){
-        logPriorValue += calculateDirichletLogPdf(theta[d], alpha);
+        logPriorDistributionValue += calculateDirichletLogPdf(theta[d], alpha);
     }
         // cout<<"thetapdf:"<<calculateDirichletLogPdf(theta[0], alpha)<<endl;
     for(int k=0; k<phi.size(); k++){
-        logPriorValue += calculateDirichletLogPdf(phi[k], beta);
+        logPriorDistributionValue += calculateDirichletLogPdf(phi[k], beta);
     }
-    return logPriorValue;
+    return logPriorDistributionValue;
 }
 
 
-double calculateTargetDistributionValue(const double &logLikelihood, const double &logPriorValue, const unsigned int &n){
+double calculateLogProposalDistributionValue(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<vector<double>> alpha, const vector<vector<double>> beta){
+    double logPriorDistributionValue = 0.0;
+    for(int d=0; d<theta.size(); d++){
+        logPriorDistributionValue += calculateDirichletLogPdf(theta[d], alpha[d]);
+    }
+        // cout<<"thetapdf:"<<calculateDirichletLogPdf(theta[0], alpha)<<endl;
+    for(int k=0; k<phi.size(); k++){
+        logPriorDistributionValue += calculateDirichletLogPdf(phi[k], beta[k]);
+    }
+    return logPriorDistributionValue;
+}
+
+
+double calculateLogTargetDistributionValue(const double &logLikelihood, const double &logPriorDistributionValue, const unsigned int &n){
     double inverseTemperature = 1.0 / log(n);
-    double targetDistributionValue = inverseTemperature * logLikelihood + logPriorValue;
-    return targetDistributionValue;
+    double logTargetDistributionValue = inverseTemperature * logLikelihood + logPriorDistributionValue;
+    return logTargetDistributionValue;
 }
 
 
@@ -117,15 +130,15 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
     unsigned int iteration = 60000;
     unsigned int burnIn = 50000;
     unsigned int samplingInterval = 100;
-    const unsigned int RATE = 50;
+    const unsigned int RATE = 1000;
     unsigned int samplingTimes = (iteration - burnIn) / samplingInterval;
     unsigned int acceptanceTimes = 0;
     double logLikelihoodAverage = 0.0;
     vector<vector<double> > theta = samplingParamFromDirichlet(alphaCandidate, D);
     vector<vector<double> > phi = samplingParamFromDirichlet(betaCandidate, K);
     double logLikelihood = calculateLogLikelihood(theta, phi, BOW);
-    double logPriorValue = calculateLogPriorValue(theta, phi, alpha, beta);
-    double targetDistValue = calculateTargetDistributionValue(logLikelihood, logPriorValue, n);
+    double logPriorDistributionValue = calculateLogPriorDistributionValue(theta, phi, alpha, beta);
+    double logTargetDistributionValue = calculateLogTargetDistributionValue(logLikelihood, logPriorDistributionValue, n);
     random_device rnd;
     mt19937 mt(rnd());
     uniform_real_distribution<double> randN(0,1);
@@ -145,17 +158,19 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
         vector<vector<double> > thetaCandidate = samplingParamFromDirichlet(alphaCandidate, D);
         vector<vector<double> > phiCandidate = samplingParamFromDirichlet(betaCandidate, K);
         double logLikelihoodCandidate = calculateLogLikelihood(thetaCandidate, phiCandidate, BOW);
-        double logPriorValueCandidate = calculateLogPriorValue(thetaCandidate, phiCandidate, alpha, beta);
-        double targetDistValueCandidate = calculateTargetDistributionValue(logLikelihoodCandidate, logPriorValueCandidate, n);
-        double acceptanceProb = exp(targetDistValueCandidate - targetDistValue + logPriorValue - logPriorValueCandidate);
+        double logPriorDistributionValueCandidate = calculateLogPriorDistributionValue(thetaCandidate, phiCandidate, alpha, beta);
+        double logTargetDistributionValueCandidate = calculateLogTargetDistributionValue(logLikelihoodCandidate, logPriorDistributionValueCandidate, n);
+        double logProposalDistributionValue = calculateLogProposalDistributionValue(theta, phi, alphaCandidate, betaCandidate);
+        double logProposalDistributionValueCandidate = calculateLogProposalDistributionValue(thetaCandidate, phiCandidate, alphaCandidate, betaCandidate);
+        double acceptanceProb = exp(logTargetDistributionValueCandidate - logTargetDistributionValue + logProposalDistributionValue - logProposalDistributionValueCandidate);
         double randomValue = randN(mt);
         if(acceptanceProb > randomValue){
             acceptanceTimes += 1;
             theta = thetaCandidate;
             phi = phiCandidate;
             logLikelihood = logLikelihoodCandidate;
-            logPriorValue = logPriorValueCandidate;
-            targetDistValue = targetDistValueCandidate;
+            logPriorDistributionValue = logPriorDistributionValueCandidate;
+            logTargetDistributionValue = logTargetDistributionValueCandidate;
         }
         if((i > burnIn-1) && (i-burnIn+1)%samplingInterval == 0){
             logLikelihoodAverage += logLikelihood;
@@ -194,8 +209,8 @@ vector<double> readHyperParam(string hyperParamFilename){
 //     boost::python::def("prod", prod);
 //     boost::python::def("calculateLogLikelihood", calculateLogLikelihood);
 //     boost::python::def("calculateDirichletLogPdf", calculateDirichletLogPdf);
-//     boost::python::def("calculateLogPriorValue", calculateLogPriorValue);
-//     boost::python::def("calculateTargetDistributionValue", calculateTargetDistributionValue);
+//     boost::python::def("calculateLogPriorDistributionValue", calculateLogPriorDistributionValue);
+//     boost::python::def("calculateLogTargetDistributionValue", calculateLogTargetDistributionValue);
 //     boost::python::def("samplingParamFromDirichlet", samplingParamFromDirichlet);
 //     boost::python::def("runWBICMetropolis", runWBICMetropolis);
 // 	class_<vector<vector<unsigned int> > >("vector<vector<unsigned int> >")
