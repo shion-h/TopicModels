@@ -210,7 +210,7 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
 
         // cout<<logLikelihoodCandidate<<endl;
         // cout<<n<<endl;
-        cout<<logLikelihood<<','<<logLikelihoodCandidate<<','<<logPriorDistributionValue<<','<<logPriorDistributionValueCandidate<<endl;
+        // cout<<logLikelihood<<','<<logLikelihoodCandidate<<','<<logPriorDistributionValue<<','<<logPriorDistributionValueCandidate<<endl;
         // cout<<logTargetDistributionValue<<' '<<logTargetDistributionValueCandidate<<endl;
         // cout<<logTargetDistributionValueCandidate<<" - "<<logTargetDistributionValue<<" + "<<logProposalDistributionValueToSample<<" - "<<logProposalDistributionValueToCandidate<<endl;
         double acceptanceProb = exp(logTargetDistributionValueCandidate - logTargetDistributionValue + logProposalDistributionValueToSample - logProposalDistributionValueToCandidate);
