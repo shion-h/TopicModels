@@ -27,18 +27,20 @@ using namespace std;
 
 class VariationalBayesEstimatorOnLDA{
 protected:
-    const vector<vector<unsigned int> > &bagOfWordsNum;
-    const unsigned int K,V;
-    vector<vector<double> > thetaEx,phiEx;
-    vector<double> alpha,beta;
-    double alphaSum,betaSum;
-    vector<double> nd, nk;
-    vector<vector<double> > ndk, nkv;
+    const vector<vector<unsigned int> > &_bagOfWordsNum;
+    const unsigned int _K, _V;
+    double _convergenceDiterminationRate;
+    vector<vector<double> > _thetaEx, _phiEx;
+    vector<double> _alpha, _beta;
+    double _alphaSum, _betaSum;
+    vector<double> _nd, _nk;
+    vector<vector<double> > _ndk, _nkv;
     const vector<string> &_wordList;
     double _variationalLowerBoundOfQz;
     double _variationalLowerBound;
+    vector<double> _VLBTimeSeries;
 public:
-    VariationalBayesEstimatorOnLDA(const vector<vector<unsigned int > > &bagOfWordsNum,const vector<string > &wordList,const unsigned int K,const unsigned int V);
+    VariationalBayesEstimatorOnLDA(const vector<vector<unsigned int > > &bagOfWordsNum, const vector<string > &wordList, const unsigned int K, const unsigned int V, const double convergenceDiterminationRate);
     virtual ~VariationalBayesEstimatorOnLDA();
     virtual void initializeHyperParam();
     virtual void initializeParam();
@@ -53,10 +55,10 @@ public:
     virtual void printThetaEx()const;
     virtual void printPhiEx()const;
     virtual void printNum()const;
-    virtual void writeParameter(string thetaFilename,string phiFilename,string alphaFilename,string betaFilename)const;
+    virtual void writeParameter(string thetaFilename, string phiFilename, string alphaFilename, string betaFilename)const;
     virtual void writeThetaEx(string thetaFilename)const;
     virtual void writePhiEx(string phiFilename)const;
-    virtual void writeVariationalLowerBound(string VLBFilename)const;
+    virtual void writeVariationalLowerBound(string VLBFilename, string VLBTimeSeriesFilename)const;
     virtual void runIteraions();
 };
 
