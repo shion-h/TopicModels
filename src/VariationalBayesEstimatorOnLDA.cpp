@@ -232,7 +232,6 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound(){//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::printHyperParameter()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"_alpha:"<<endl;
     for(int i=0;i<_alpha.size();i++){
         cout<<_alpha[i]<<' ';
@@ -329,7 +328,6 @@ void VariationalBayesEstimatorOnLDA::printTopFactor(int numOfTopFactor)const{//{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::printThetaEx()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"_thetaEx:"<<endl;
     for(int i=0;i<_thetaEx.size();i++){
         for(int j=0;j<_thetaEx[i].size();j++){
@@ -340,7 +338,6 @@ void VariationalBayesEstimatorOnLDA::printThetaEx()const{//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::printPhiEx()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"_phiEx:"<<endl;
     for(int i=0;i<_phiEx.size();i++){
         for(int j=0;j<_phiEx[i].size();j++){
@@ -351,7 +348,6 @@ void VariationalBayesEstimatorOnLDA::printPhiEx()const{//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::printNum()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"numOfOccurencesOfTopic:"<<endl;
     for(int i=0;i<_nk.size();i++){
         cout<<_nk[i]<<' ';

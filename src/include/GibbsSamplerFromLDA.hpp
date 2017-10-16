@@ -124,7 +124,6 @@ void BaseGibbsSampler<MODEL>::hyperParamUpdate(){//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printTheta()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"theta:"<<endl;
     for(int i=0;i<_model->theta.size();i++){
         for(int j=0;j<_model->theta[i].size();j++){
@@ -135,7 +134,6 @@ void BaseGibbsSampler<MODEL>::printTheta()const{//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printPhi()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"phi:"<<endl;
     for(int i=0;i<_model->phi.size();i++){
         for(int j=0;j<_model->phi[i].size();j++){
@@ -146,7 +144,6 @@ void BaseGibbsSampler<MODEL>::printPhi()const{//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printThetaEx()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"thetaEx:"<<endl;
     for(int i=0;i<_model->thetaEx.size();i++){
         for(int j=0;j<_model->thetaEx[i].size();j++){
@@ -157,7 +154,6 @@ void BaseGibbsSampler<MODEL>::printThetaEx()const{//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printPhiEx()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"phiEx:"<<endl;
     for(int i=0;i<_model->phiEx.size();i++){
         for(int j=0;j<_model->phiEx[i].size();j++){
@@ -168,7 +164,6 @@ void BaseGibbsSampler<MODEL>::printPhiEx()const{//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printNum()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"numOfOccurencesOfTopic:"<<endl;
     for(int i=0;i<_model->topicCounts.size();i++){
         cout<<_model->topicCounts[i]<<' ';
@@ -193,7 +188,6 @@ void BaseGibbsSampler<MODEL>::printNum()const{//{{{
 }//}}}
 template<typename MODEL>
 void BaseGibbsSampler<MODEL>::printHyperParameter()const{//{{{
-    cout<<fixed<<setprecision(5);
     cout<<"alpha:"<<endl;
     for(int i=0;i<_model->alpha.size();i++){
         cout<<_model->alpha[i]<<' ';
