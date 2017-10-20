@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
     ("nmit,s", boost::program_options::value<unsigned int>()->default_value(1000), "number of iterations(only used by sampling algorythm)")
     ("bnin,b", boost::program_options::value<unsigned int>(), "burn in period(only used by sampling algorythm)")
     ("intv,i", boost::program_options::value<unsigned int>()->default_value(10), "sampling interval(only used by sampling algorythm)")
-    ("cdrt,d", boost::program_options::value<double>()->default_value(0.0001), "convergence ditermination rate(only used by VB algorythm)")
+    ("cdrt,d", boost::program_options::value<double>()->default_value(0.001), "convergence ditermination rate(only used by VB algorythm)")
     ("lrna,l", boost::program_options::value<unsigned int>()->default_value(1), "learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)")
     ("nmsh,f", boost::program_options::value<unsigned int>()->default_value(5), "number of factors with high probability to show")
     ("otpt,o", boost::program_options::value<string>()->default_value("./"), "directory name for output")

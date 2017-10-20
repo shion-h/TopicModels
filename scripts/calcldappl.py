@@ -29,7 +29,7 @@ from iomodule import create_command_string, parse_result
 from bowmodule import make_bag_of_words_num, make_frequency_matrix
 
 lda_directory_path = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
-timestamp = dt.now().strftime('%m%d_%a_%H_%M_%S')
+timestamp = dt.now().strftime('%m%d_%a_%H_%M')
 
 
 def calculate_log_likelihood(theta, phi, BOW):
@@ -62,6 +62,7 @@ class PerplexityCalculator():
         self.kstep = int(kstep)
         self.rate_of_train_data = float(rate_of_train_data)
         self.iteration = int(iteration)
+        self.ID = ''
 
     # TODO:訓練perplexityも計算
     def split_train_test(self):
@@ -77,30 +78,35 @@ class PerplexityCalculator():
             train_BOW.append(train_words)
             test_BOW.append(test_words)
         try:
-            os.mkdir(lda_directory_path + '/data/' + timestamp)
+            os.mkdir(lda_directory_path + '/data/' + timestamp + self.ID)
         except FileExistsError:
             pass
         make_frequency_matrix(train_BOW, self.word_list,
-                              lda_directory_path + '/data/' + timestamp + '/trainBOW')
+                              lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW')
         make_frequency_matrix(test_BOW, self.word_list,
-                              lda_directory_path+'/data/' + timestamp + '/testBOW')
+                              lda_directory_path+'/data/' + timestamp + self.ID + '/testBOW')
         self.test_BOW = test_BOW
 
     def execute_estimation(self):
-        try:
-            os.mkdir(lda_directory_path + '/output/' + timestamp)
-        except FileExistsError:
-            exit()
+        count = 0
+        while True:
+            try:
+                os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
+                self.ID = '_' + str(count)
+                break
+            except FileExistsError:
+                pass
+            count += 1
         for topic_num in range(self.k_min, self.k_max, self.kstep):
             sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
-            output_dir = lda_directory_path + '/output/' + timestamp + '/K_'+str(topic_num)
+            output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
             try:
                 os.mkdir(output_dir)
             except FileExistsError:
                 pass
             command = create_command_string(topic_num, self.iteration,
                                             lda_directory_path, output_dir,
-                                            lda_directory_path + '/data/' + timestamp + '/trainBOW')
+                                            lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW')
             subprocess.call(command.split(' '),
                             stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
@@ -110,9 +116,9 @@ class PerplexityCalculator():
             test_words_num += len(document)
         for topic_num in range(self.k_min, self.k_max, self.kstep):
             theta, phi = parse_result(
-                lda_directory_path+'/output/'+timestamp+'/K_'+str(topic_num)+'/theta.csv',
-                lda_directory_path+'/output/'+timestamp+'/K_'+str(topic_num)+'/phi.csv',
-                lda_directory_path+'/output/'+timestamp+'/K_'+str(topic_num)+'/wordList.csv'
+                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/theta.csv',
+                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/phi.csv',
+                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/wordList.csv'
             )
             perplexity = calculate_perplexity(theta, phi, self.test_BOW, test_words_num)
             print('{0},{1}'.format(topic_num, perplexity))

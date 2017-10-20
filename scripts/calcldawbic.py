@@ -31,7 +31,7 @@ from iomodule import create_command_string
 from bowmodule import make_bag_of_words_num, make_frequency_matrix
 from calcldappl import calculate_log_likelihood
 lda_directory_path = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
-timestamp = dt.now().strftime('%m%d_%a_%H_%M_%S')
+timestamp = dt.now().strftime('%m%d_%a_%H_%M')
 
 
 class WBICCalculator():
@@ -41,15 +41,21 @@ class WBICCalculator():
         self.k_max = int(k_max)
         self.kstep = int(kstep)
         self.iteration = int(iteration)
+        self.ID = ''
 
     def execute_estimation(self):
-        try:
-            os.mkdir(lda_directory_path + '/output/' + timestamp)
-        except FileExistsError:
-            exit()
+        count = 0
+        while True:
+            try:
+                os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
+                self.ID = '_' + str(count)
+                break
+            except FileExistsError:
+                pass
+            count += 1
         for topic_num in range(self.k_min, self.k_max, self.kstep):
             sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
-            output_dir = lda_directory_path + '/output/' + timestamp + '/K_'+str(topic_num)
+            output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
             try:
                 os.mkdir(output_dir)
             except FileExistsError:
@@ -64,9 +70,9 @@ class WBICCalculator():
     def calculate_WBIC(self, topic_num):
         command = lda_directory_path + "/src/LDAWBIC " + \
                   self.BOW_filename + ' ' + lda_directory_path + \
-                  '/output/' + timestamp+'/K_' + str(topic_num) + \
+                  '/output/' + timestamp+self.ID+'/K_' + str(topic_num) + \
                   '/alpha.csv ' + lda_directory_path + '/output/' + \
-                  timestamp+'/K_' + str(topic_num) + '/beta.csv'
+                  timestamp+self.ID+'/K_' + str(topic_num) + '/beta.csv'
         # print(command)
         subprocess.call(command.split(' '))
 

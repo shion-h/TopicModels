@@ -95,8 +95,8 @@ void VariationalBayesEstimatorOnLDA::initializeParam(){//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::initializeHyperParam(){//{{{
-    _alpha.assign(_K, 0.011);
-    _beta.assign(_V, 0.003);
+    _alpha.assign(_K, 0.1);
+    _beta.assign(_V, 0.05);
     calculateHyperParamSum();
 }//}}}
 

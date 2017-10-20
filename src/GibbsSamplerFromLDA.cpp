@@ -53,8 +53,8 @@ void LDA::initializeParam(){//{{{
 }//}}}
 
 void LDA::initializeHyperParam(){//{{{
-    alpha.assign(K,0.011);
-    beta.assign(V,0.003);
+    alpha.assign(K,0.1);
+    beta.assign(V,0.05);
     calculateHyperParamSum();
 }//}}}
 
