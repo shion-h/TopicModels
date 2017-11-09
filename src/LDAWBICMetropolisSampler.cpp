@@ -8,8 +8,6 @@
 //
 
 #include "include/LDAWBICMetropolisSampler.hpp"
-// #include <boost/python.hpp>
-// #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 
 vector<vector<double> > prod(const vector<vector<double> > &theta, const vector<vector<double> > &phi){

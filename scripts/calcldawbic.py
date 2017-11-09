@@ -68,7 +68,7 @@ class WBICCalculator():
                             stderr=subprocess.STDOUT)
 
     def calculate_WBIC(self, topic_num):
-        command = lda_directory_path + "/src/LDAWBIC " + \
+        command = lda_directory_path + "/LDAWBIC " + \
                   self.BOW_filename + ' ' + lda_directory_path + \
                   '/output/' + timestamp+self.ID+'/K_' + str(topic_num) + \
                   '/alpha.csv ' + lda_directory_path + '/output/' + \
