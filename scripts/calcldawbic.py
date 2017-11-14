@@ -43,7 +43,7 @@ class WBICCalculator():
         self.iteration = int(iteration)
         self.ID = ''
 
-    def execute_estimation(self):
+    def make_output_dir(self):
         count = 0
         while True:
             try:
@@ -53,19 +53,20 @@ class WBICCalculator():
             except FileExistsError:
                 pass
             count += 1
-        for topic_num in range(self.k_min, self.k_max, self.kstep):
-            sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
-            output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
-            try:
-                os.mkdir(output_dir)
-            except FileExistsError:
-                pass
-            command = create_command_string(topic_num, self.iteration,
-                                            lda_directory_path, output_dir,
-                                            self.BOW_filename)
-            subprocess.call(command.split(' '),
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.STDOUT)
+
+    def execute_estimation(self,topic_num):
+        sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
+        output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
+        try:
+            os.mkdir(output_dir)
+        except FileExistsError:
+            pass
+        command = create_command_string(topic_num, lda_directory_path, 
+                                        output_dir, self.BOW_filename, 
+                                        iteration=self.iteration)
+        subprocess.call(command.split(' '),
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.STDOUT)
 
     def calculate_WBIC(self, topic_num):
         command = lda_directory_path + "/LDAWBIC " + \
@@ -77,9 +78,12 @@ class WBICCalculator():
         subprocess.call(command.split(' '))
 
     def run(self):
-        self.execute_estimation()
-        print('\nestimate done')
+        self.make_output_dir()
         pool = Pool(processes=4)
+        _ = pool.map(self.execute_estimation,
+                 range(self.k_min, self.k_max, self.kstep))
+        sys.stdout.write('\r' + ' '*100 + '\r')
+        sys.stdout.write('\restimate done\r')
         _ = pool.map(self.calculate_WBIC,
                  range(self.k_min, self.k_max, self.kstep))
 

@@ -64,7 +64,17 @@ class PerplexityCalculator():
         self.iteration = int(iteration)
         self.ID = ''
 
-    # TODO:訓練perplexityも計算
+    def make_output_dir(self):
+        count = 0
+        while True:
+            try:
+                os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
+                self.ID = '_' + str(count)
+                break
+            except FileExistsError:
+                pass
+            count += 1
+
     def split_train_test(self):
         train_BOW = []
         test_BOW = []
@@ -88,27 +98,18 @@ class PerplexityCalculator():
         self.test_BOW = test_BOW
 
     def execute_estimation(self):
-        count = 0
-        while True:
-            try:
-                os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
-                self.ID = '_' + str(count)
-                break
-            except FileExistsError:
-                pass
-            count += 1
-        for topic_num in range(self.k_min, self.k_max, self.kstep):
-            sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
-            output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
-            try:
-                os.mkdir(output_dir)
-            except FileExistsError:
-                pass
-            command = create_command_string(topic_num, self.iteration,
-                                            lda_directory_path, output_dir,
-                                            lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW')
-            subprocess.call(command.split(' '),
-                            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
+        output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
+        try:
+            os.mkdir(output_dir)
+        except FileExistsError:
+            pass
+        command = create_command_string(topic_num, lda_directory_path,
+                                        output_dir,
+                                        lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW', 
+                                        iteration=self.iteration)
+        subprocess.call(command.split(' '),
+                        stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     def calculate_perplexity_each_topic_num(self):
         test_words_num = 0
@@ -126,9 +127,14 @@ class PerplexityCalculator():
 
     def run(self):
         self.split_train_test()
-        print('split done')
-        self.execute_estimation()
-        print('\nestimate done')
+        sys.stdout.write('split done\r')
+        self.make_output_dir()
+        pool = Pool(processes=4)
+        _ = pool.map(self.execute_estimation,
+                 range(self.k_min, self.k_max, self.kstep))
+        sys.stdout.write('\r' + ' '*100 + '\r')
+        sys.stdout.write('\restimate done\r')
+        sys.stdout.write('\r' + ' '*100 + '\r')
         self.calculate_perplexity_each_topic_num()
 
 
