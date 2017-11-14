@@ -162,14 +162,6 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
             alphaMatrix[d][k] = theta[d][k] * (alphaSum - K) + 1;
         }
     }
-    // TODO:Candidateのpriorvalueが低すぎる, ほとんど同じtheta, phi のはずなのになぜ
-    // for(int d=0; d<D; d++){
-    // for(int k=0; k<K; k++){
-    //     cout<<theta[d][k]<<' ';
-    // }
-    // cout<<endl;
-    // }
-    // cout<<endl;
     for(int k=0; k<K; k++){
         for(int v=0; v<V; v++){
             betaMatrix[k][v] = phi[k][v] * (betaSum - V) + 1;
@@ -184,17 +176,6 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
                 alphaMatrixCandidate[d][k] = thetaCandidate[d][k] * (alphaSum - K) + 1;
             }
         }
-        // for(int d=0; d<D; d++){
-        // for(int k=0; k<K; k++){
-        //     cout<<thetaCandidate[d][k]<<' ';
-        // }
-        // cout<<endl;
-        // }
-        // cout<<endl;
-        // for(int k=0; k<K; k++){
-        //     cout<<thetaCandidate[0][k]<<' ';
-        // }
-        // cout<<endl;
         for(int k=0; k<K; k++){
             for(int v=0; v<V; v++){
                 betaMatrixCandidate[k][v] = phiCandidate[k][v] * (betaSum - V) + 1;
@@ -206,11 +187,6 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
         double logProposalDistributionValueToCandidate = calculateLogProposalDistributionValue(thetaCandidate, phiCandidate, alphaMatrix, betaMatrix);
         double logProposalDistributionValueToSample = calculateLogProposalDistributionValue(theta, phi, alphaMatrixCandidate, betaMatrixCandidate);
 
-        // cout<<logLikelihoodCandidate<<endl;
-        // cout<<n<<endl;
-        // cout<<logLikelihood<<','<<logLikelihoodCandidate<<','<<logPriorDistributionValue<<','<<logPriorDistributionValueCandidate<<endl;
-        // cout<<logTargetDistributionValue<<' '<<logTargetDistributionValueCandidate<<endl;
-        // cout<<logTargetDistributionValueCandidate<<" - "<<logTargetDistributionValue<<" + "<<logProposalDistributionValueToSample<<" - "<<logProposalDistributionValueToCandidate<<endl;
         double acceptanceProb = exp(logTargetDistributionValueCandidate - logTargetDistributionValue + logProposalDistributionValueToSample - logProposalDistributionValueToCandidate);
         double randomValue = randN(mt);
         if(acceptanceProb > randomValue){
@@ -226,7 +202,6 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
         if((i > burnIn-1) && (i-burnIn+1)%samplingInterval == 0){
             logLikelihoodAverage += logLikelihood;
         }
-        // cout<<logLikelihood<<endl;
     }
     logLikelihoodAverage /= samplingTimes;
     cout<<"acceptanceTimes: "<<acceptanceTimes<<endl;
@@ -252,24 +227,3 @@ vector<double> readHyperParam(string hyperParamFilename){
     }
     return param;
 }
-
-
-//
-//
-// BOOST_PYTHON_MODULE(WBICMetropolisSampler){
-//     boost::python::def("prod", prod);
-//     boost::python::def("calculateLogLikelihood", calculateLogLikelihood);
-//     boost::python::def("calculateDirichletLogPdf", calculateDirichletLogPdf);
-//     boost::python::def("calculateLogPriorDistributionValue", calculateLogPriorDistributionValue);
-//     boost::python::def("calculateLogTargetDistributionValue", calculateLogTargetDistributionValue);
-//     boost::python::def("samplingParamFromDirichlet", samplingParamFromDirichlet);
-//     boost::python::def("runWBICMetropolis", runWBICMetropolis);
-// 	class_<vector<vector<unsigned int> > >("vector<vector<unsigned int> >")
-// 	.def(vector_indexing_suite<vector<vector<unsigned int> > >());
-// 	class_<vector<vector<double> > >("vector<vector<double> >")
-// 	.def(vector_indexing_suite<vector<vector<double> > >());
-// 	class_<vector<unsigned int> >("vector<unsigned int>")
-// 	.def(vector_indexing_suite<vector<unsigned int> >());
-// 	class_<vector<double> >("vector<double>")
-// 	.def(vector_indexing_suite<vector<double> >());
-// }

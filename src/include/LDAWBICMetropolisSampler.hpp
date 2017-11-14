@@ -9,8 +9,8 @@
 
 #include<random>
 #include<math.h>
-#include <boost/math/special_functions/gamma.hpp>
-#include "BOWFileParser.hpp"
+#include<boost/math/special_functions/gamma.hpp>
+#include"BOWFileParser.hpp"
 
 using namespace std;
 
