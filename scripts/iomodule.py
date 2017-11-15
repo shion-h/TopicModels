@@ -21,14 +21,14 @@
 import pandas as pd
 
 
-def create_command_string(topic_num, lda_directory_path, output_dir, BOW_filename, iteration=1000, algorythm_flag=1, det_conv=0.001):
+def create_command_string(topic_num, lda_directory_path, output_dir, BOW_filename, iteration=1000, algorythm_flag=1, conv_det=0.001):
     command = lda_directory_path + '/LDA ' + BOW_filename
     command += (' -k '+str(topic_num))
     command += (' -s '+str(iteration))
     command += (' -b '+str(int(iteration*0.8)))
     command += (' -i '+str(5))
     command += (' -l '+str(algorythm_flag))
-    command += (' -d '+str(det_conv))
+    command += (' -d '+str(conv_det))
     command += ' -o ' + output_dir + '/'
     return command
 

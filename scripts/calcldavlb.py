@@ -62,9 +62,9 @@ class VLBCalculator():
             os.mkdir(output_dir)
         except FileExistsError:
             pass
-        command = create_command_string(topic_num, self.iteration,
-                                        lda_directory_path, output_dir,
-                                        self.BOW_filename, algorythm_flag=2)
+        command = create_command_string(topic_num,lda_directory_path,
+                                        output_dir,self.BOW_filename,
+                                        algorythm_flag=2, conv_det=self.conv_det)
         subprocess.call(command.split(' '),
                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         # p = subprocess.Popen(command.split(' '),
