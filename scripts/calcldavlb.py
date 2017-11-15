@@ -40,7 +40,7 @@ class VLBCalculator():
         self.k_min = int(k_min)
         self.k_max = int(k_max)
         self.kstep = int(kstep)
-        self.conv_det = double(conv_det)
+        self.conv_det = float(conv_det)
         self.iteration = 100 # dummy
         self.ID = ''
 
