@@ -439,7 +439,6 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
             break;
         }
         prevVariationalLowerBound = thisVariationalLowerBound;
-        calculateEx();
         nExUpdate();
         hyperParamUpdate();
         thisVariationalLowerBound = calculateVariationalLowerBound();
@@ -447,5 +446,6 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
         count++;
     }
+    calculateEx();
     cout<<"iter:"<<count<<endl;
 }//}}}
