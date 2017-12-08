@@ -56,8 +56,6 @@ public:
     virtual void printPhiEx()const;
     virtual void printNum()const;
     virtual void writeParameter(string thetaFilename, string phiFilename, string alphaFilename, string betaFilename)const;
-    virtual void writeThetaEx(string thetaFilename)const;
-    virtual void writePhiEx(string phiFilename)const;
     virtual void writeVariationalLowerBound(string VLBFilename, string VLBTimeSeriesFilename)const;
     virtual void runIteraions();
 };

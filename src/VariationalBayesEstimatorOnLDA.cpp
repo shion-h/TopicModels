@@ -152,7 +152,7 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
             for(int k=0; k<_K; k++){
                 _ndkBuf[d][k] += qzdi[k];
                 _nkvBuf[k][_bagOfWordsNum[d][i]] += qzdi[k];
-                _variationalLowerBoundOfQz = qzdi[k] * log(qzdi[k]);
+                _variationalLowerBoundOfQz += qzdi[k] * log(qzdi[k]);
                 // cout<<qzdi[k]<<endl;
             }
         }
@@ -372,7 +372,6 @@ void VariationalBayesEstimatorOnLDA::printNum()const{//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::writeParameter(string thetaFilename, string phiFilename, string alphaFilename, string betaFilename)const{//{{{
-// TODO:VLB書き出し
     ofstream thetaOutput;
     ofstream phiOutput;
     ofstream alphaOutput;
@@ -413,36 +412,6 @@ void VariationalBayesEstimatorOnLDA::writeParameter(string thetaFilename, string
     phiOutput.close();
     alphaOutput.close();
     betaOutput.close();
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::writeThetaEx(string thetaFilename)const{//{{{
-    ofstream thetaOutput;
-    thetaOutput.open(thetaFilename, ios::out);
-
-    for(int i=0;i<_thetaEx.size();i++){
-        for(int j=0;j<_thetaEx[i].size();j++){
-            thetaOutput<<_thetaEx[i][j];
-            if(j!=(_thetaEx[i].size()-1)){
-                thetaOutput<<',';
-            }
-        }
-        thetaOutput<<endl;
-    }
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::writePhiEx(string phiFilename)const{//{{{
-    ofstream phiOutput;
-    phiOutput.open(phiFilename, ios::out);
-
-    for(int i=0;i<_phiEx.size();i++){
-        for(int j=0;j<_phiEx[i].size();j++){
-            phiOutput<<_phiEx[i][j];
-            if(j!=(_phiEx[i].size()-1)){
-                phiOutput<<',';
-            }
-        }
-        phiOutput<<endl;
-    }
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilename, string VLBTimeSeriesFilename)const{//{{{
