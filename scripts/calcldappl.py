@@ -98,7 +98,6 @@ class PerplexityCalculator():
         self.test_BOW = test_BOW
 
     def execute_estimation(self):
-        sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
         output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
         try:
             os.mkdir(output_dir)
@@ -127,14 +126,10 @@ class PerplexityCalculator():
 
     def run(self):
         self.split_train_test()
-        sys.stdout.write('split done\r')
         self.make_output_dir()
         pool = Pool(processes=4)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
-        sys.stdout.write('\r' + ' '*100 + '\r')
-        sys.stdout.write('\restimate done\r')
-        sys.stdout.write('\r' + ' '*100 + '\r')
         self.calculate_perplexity_each_topic_num()
 
 

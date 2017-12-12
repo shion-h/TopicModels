@@ -95,8 +95,6 @@ double calculateLogTargetDistributionValue(const double &logLikelihood, const do
 
 
 vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> > &param, const unsigned int &N){
-    //TODO:
-    // unsigned int N = param.size();
     unsigned int p = param[0].size();
     vector<vector<double> > ret(N);
     for(int n=0;n<ret.size();n++)ret[n].assign(p,0);

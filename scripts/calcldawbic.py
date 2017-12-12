@@ -55,7 +55,6 @@ class WBICCalculator():
             count += 1
 
     def execute_estimation(self,topic_num):
-        sys.stdout.write('estimating(' +str(topic_num)+ 'topics-LDA)...\r')
         output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
         try:
             os.mkdir(output_dir)
@@ -82,8 +81,6 @@ class WBICCalculator():
         pool = Pool(processes=4)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
-        sys.stdout.write('\r' + ' '*100 + '\r')
-        sys.stdout.write('\restimate done\r')
         _ = pool.map(self.calculate_WBIC,
                  range(self.k_min, self.k_max, self.kstep))
 

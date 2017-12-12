@@ -25,8 +25,8 @@ VariationalBayesEstimatorOnLDA::VariationalBayesEstimatorOnLDA(const vector<vect
      _nd(bagOfWordsNum.size()),
      _nkv(K),
      _ndk(bagOfWordsNum.size()){
-    initializeParam();
-    initializeHyperParam();
+    this->initializeParam();
+    this->initializeHyperParam();
 }//}}}
 
 VariationalBayesEstimatorOnLDA::~VariationalBayesEstimatorOnLDA(){//{{{
@@ -48,6 +48,10 @@ void VariationalBayesEstimatorOnLDA::initializeParam(){//{{{
     for(int d=0;d<_bagOfWordsNum.size();d++){
         wordCount += _bagOfWordsNum[d].size();
     }
+    for(int d=0;d<_bagOfWordsNum.size();d++){
+        _nd[d] = _bagOfWordsNum[d].size();
+    }
+
     for(int k=0;k<_nkv.size();k++){
         for(int v=0;v<_nkv[k].size();v++){
             double randomValue=randN(mt);
@@ -65,28 +69,26 @@ void VariationalBayesEstimatorOnLDA::initializeParam(){//{{{
             _nkv[k][v] /= Z/wordCount;
         }
     }
+
     for(int d=0;d<_ndk.size();d++){
         for(int k=0;k<_ndk[d].size();k++){
             double randomValue=randN(mt);
             _ndk[d][k] = randomValue;
         }
     }
-    Z = 0;
+    vector<double> ndkSum(_bagOfWordsNum.size());
+    for(int d=0;d<_ndk.size();d++){
+        ndkSum[d] = 0;
+        for(int k=0;k<_ndk[d].size();k++){
+            ndkSum[d] += _ndk[d][k];
+        }
+    }
     for(int d=0;d<_ndk.size();d++){
         for(int k=0;k<_ndk[d].size();k++){
-            Z += _ndk[d][k];
+            _ndk[d][k] /= ndkSum[d]/_nd[d];
         }
     }
-    for(int d=0;d<_ndk.size();d++){
-        for(int k=0;k<_ndk[d].size();k++){
-            _ndk[d][k] /= Z/wordCount;
-        }
-    }
-    for(int d=0;d<_bagOfWordsNum.size();d++){
-        for(int k=0;k<_K;k++){
-            _nd[d] += _ndk[d][k];
-        }
-    }
+
     for(int k=0;k<_K;k++){
         for(int v=0;v<_V;v++){
             _nk[k] += _nkv[k][v];
@@ -97,7 +99,7 @@ void VariationalBayesEstimatorOnLDA::initializeParam(){//{{{
 void VariationalBayesEstimatorOnLDA::initializeHyperParam(){//{{{
     _alpha.assign(_K, 0.1);
     _beta.assign(_V, 0.05);
-    calculateHyperParamSum();
+    this->calculateHyperParamSum();
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::calculateEx(){//{{{
@@ -146,23 +148,18 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
     for(int d=0;d<_bagOfWordsNum.size();d++){
         for(int i=0;i<_bagOfWordsNum[d].size();i++){
             vector<double> qzdi;
-// TODO: 同じvなら呼ばない?
             qzdi = calculateQz(d, i);
             double temp = 0;
             for(int k=0; k<_K; k++){
                 _ndkBuf[d][k] += qzdi[k];
                 _nkvBuf[k][_bagOfWordsNum[d][i]] += qzdi[k];
                 _variationalLowerBoundOfQz += qzdi[k] * log(qzdi[k]);
-                // cout<<qzdi[k]<<endl;
             }
         }
     }
     for(int d=0;d<_bagOfWordsNum.size();d++){
-        _nd[d] = 0;
         for(int k=0;k<_K;k++){
-            // cout<<_ndkBuf[d][k]<<endl;
             _ndk[d][k] = _ndkBuf[d][k];
-            _nd[d] += _ndkBuf[d][k];
         }
     }
     for(int k=0;k<_K;k++){
@@ -179,17 +176,9 @@ void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
     double numerator=0, denominator=0;
     for(int k=0;k<_K;k++){
         for(int d=0;d<_bagOfWordsNum.size();d++){
-            // cout<<d<<endl;
-            // cout<<k<<endl;
-            // cout<<_ndk[d][k]<<endl;
-            // cout<<_nd[d]<<endl;
-            // cout<<_alpha[k]<<endl;
-            // cout<<endl;
             numerator+=(boost::math::digamma(_ndk[d][k]+_alpha[k])-boost::math::digamma(_alpha[k]))*_alpha[k];
             denominator+=boost::math::digamma(_nd[d]+_alphaSum)-boost::math::digamma(_alphaSum);
         }
-        // cout<<numerator<<endl;
-        // cout<<denominator<<endl<<endl;
         _alpha[k]=numerator/denominator;
     }
     double _betaUpdated;
@@ -197,20 +186,13 @@ void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
     denominator=0;
     for(int k=0;k<_K;k++){
         for(int v=0;v<_V;v++){
-            // cout<<k<<endl;
-            // cout<<v<<endl;
-            // cout<<_nkv[k][v]<<endl;
-            // cout<<_beta[v]<<endl;
-            // cout<<endl;
             numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
         }
         denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
     }
-            // cout<<numerator<<endl;
-            // cout<<denominator<<endl;
     _betaUpdated=numerator/denominator/_V;
     _beta.assign(_V, _betaUpdated);
-    calculateHyperParamSum();
+    this->calculateHyperParamSum();
 }//}}}
 
 double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound(){//{{{
@@ -246,74 +228,74 @@ void VariationalBayesEstimatorOnLDA::printHyperParameter()const{//{{{
 
 void VariationalBayesEstimatorOnLDA::printTopFactor(int numOfTopFactor)const{//{{{
     vector<vector<double> > topFactorOfTheta;
-    vector<vector<int> >  topFactorOfThetaI_ndex;
+    vector<vector<int> >  topFactorOfThetaIndex;
     vector<vector<double> > topFactorOfPhi;
-    vector<vector<int> >  topFactorOfPhiI_ndex;
+    vector<vector<int> >  topFactorOfPhiIndex;
     vector<double> maxValue;
-    vector<int> maxValueI_ndex;
+    vector<int> maxValueIndex;
 
     for(int d=0;d<_thetaEx.size();d++){
         for(int k=0;k<_thetaEx[d].size();k++){
             if(k<numOfTopFactor){
                 maxValue.push_back(_thetaEx[d][k]);
-                maxValueI_ndex.push_back(k);
+                maxValueIndex.push_back(k);
             }else{
                 double minInMaxValue=maxValue[0];
-                int minInMaxValueI_ndex=0;
-                for(int i=1;i<maxValue.size();i++){//fi_nd min in maxValue
+                int minInMaxValueIndex=0;
+                for(int i=1;i<maxValue.size();i++){//find min in maxValue
                     if(minInMaxValue>maxValue[i]){
                         minInMaxValue=maxValue[i];
-                        minInMaxValueI_ndex=i;
+                        minInMaxValueIndex=i;
                     }
                 }
                 if(minInMaxValue<_thetaEx[d][k]){
                     // cout<<"min:"<<minInMaxValue<<"_thetaEx:"<<_thetaEx[d][k]<<endl;
-                    maxValue[minInMaxValueI_ndex]=_thetaEx[d][k];
-                    maxValueI_ndex[minInMaxValueI_ndex]=k;
+                    maxValue[minInMaxValueIndex]=_thetaEx[d][k];
+                    maxValueIndex[minInMaxValueIndex]=k;
                 }
             }
         }
         topFactorOfTheta.push_back(maxValue);
-        topFactorOfThetaI_ndex.push_back(maxValueI_ndex);
+        topFactorOfThetaIndex.push_back(maxValueIndex);
         maxValue.clear();
-        maxValueI_ndex.clear();
+        maxValueIndex.clear();
     }
     for(int k=0;k<_phiEx.size();k++){
         for(int v=0;v<_phiEx[k].size();v++){
             if(v<numOfTopFactor){
                 maxValue.push_back(_phiEx[k][v]);
-                maxValueI_ndex.push_back(v);
+                maxValueIndex.push_back(v);
             }else{
                 double minInMaxValue=maxValue[0];
-                int minInMaxValueI_ndex=0;
+                int minInMaxValueIndex=0;
                 for(int i=1;i<maxValue.size();i++){//fi_nd min in maxValue
                     if(minInMaxValue>maxValue[i]){
                         minInMaxValue=maxValue[i];
-                        minInMaxValueI_ndex=i;
+                        minInMaxValueIndex=i;
                     }
                 }
                 if(minInMaxValue<_phiEx[k][v]){
                     // cout<<"min:"<<minInMaxValue<<"_phiEx:"<<_phiEx[k][v]<<endl;
-                    maxValue[minInMaxValueI_ndex]=_phiEx[k][v];
-                    maxValueI_ndex[minInMaxValueI_ndex]=v;
+                    maxValue[minInMaxValueIndex]=_phiEx[k][v];
+                    maxValueIndex[minInMaxValueIndex]=v;
                 }
             }
         }
         topFactorOfPhi.push_back(maxValue);
-        topFactorOfPhiI_ndex.push_back(maxValueI_ndex);
+        topFactorOfPhiIndex.push_back(maxValueIndex);
         maxValue.clear();
-        maxValueI_ndex.clear();
+        maxValueIndex.clear();
     }
     for(int d=0;d<topFactorOfTheta.size();d++){
         cout<<"doc"<<d<<':'<<endl;
         for(int n=0;n<topFactorOfTheta[d].size();n++){
-            cout<<"topic"<<topFactorOfThetaI_ndex[d][n]<<": "<<topFactorOfTheta[d][n]<<endl;
+            cout<<"topic"<<topFactorOfThetaIndex[d][n]<<": "<<topFactorOfTheta[d][n]<<endl;
         }
     }
     for(int k=0;k<topFactorOfPhi.size();k++){
         cout<<"topic"<<k<<':'<<endl;
         for(int n=0;n<topFactorOfPhi[k].size();n++){
-            cout<<_wordList[topFactorOfPhiI_ndex[k][n]]<<": "<<topFactorOfPhi[k][n]<<endl;
+            cout<<_wordList[topFactorOfPhiIndex[k][n]]<<": "<<topFactorOfPhi[k][n]<<endl;
         }
     }
     cout<<"_alpha"<<endl;
@@ -429,8 +411,8 @@ void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilena
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
-    double prevVariationalLowerBound = 1;
-    double thisVariationalLowerBound = 2;
+    double prevVariationalLowerBound = 0;
+    double thisVariationalLowerBound = 0;
     unsigned int count = 0;
     while(1){
         if(count<2){
@@ -439,13 +421,13 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
             break;
         }
         prevVariationalLowerBound = thisVariationalLowerBound;
-        nExUpdate();
-        hyperParamUpdate();
-        thisVariationalLowerBound = calculateVariationalLowerBound();
+        this->nExUpdate();
+        this->hyperParamUpdate();
+        thisVariationalLowerBound = this->calculateVariationalLowerBound();
         cout<<"VLB"<<thisVariationalLowerBound<<endl;
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
         count++;
     }
-    calculateEx();
+    this->calculateEx();
     cout<<"iter:"<<count<<endl;
 }//}}}
