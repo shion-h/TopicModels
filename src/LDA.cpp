@@ -84,6 +84,7 @@ int main(int argc, char *argv[]){
         if(vm.count("lrna"))learningAlgorythmFlag = vm["lrna"].as<unsigned int>();
         if(vm.count("nmsh"))numOfTopFactor = vm["nmsh"].as<unsigned int>();
         if(vm.count("otpt"))outputDirectory = vm["otpt"].as<std::string>();
+        if(outputDirectory[outputDirectory.size()-1] != '/')outputDirectory.push_back('/')
         cout<<outputDirectory<<endl;
         thetaFilename = outputDirectory + "theta.csv";
         phiFilename = outputDirectory + "phi.csv";

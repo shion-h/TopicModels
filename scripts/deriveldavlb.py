@@ -1,5 +1,5 @@
 #
-# calcldavlb.py
+# deriveldavlb.py
 #
 # Copyright (c) 2017 Shion Hosoda
 #
@@ -34,29 +34,31 @@ lda_directory_path = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0
 timestamp = dt.now().strftime('%m%d_%a_%H_%M')
 
 
-class VLBCalculator():
-    def __init__(self, BOW_filename, k_min, k_max, kstep, conv_det):
+class VLBDeriver():
+    def __init__(self, BOW_filename, k_min, k_max, kstep, conv_det, output_dir):
         self.BOW_filename = BOW_filename
         self.k_min = int(k_min)
         self.k_max = int(k_max)
         self.kstep = int(kstep)
         self.conv_det = float(conv_det)
-        self.iteration = 100 # dummy
-        self.ID = ''
+        self.output_dir = output_dir
+        if len(output_dir) != 0:
+            if output_dir[-1] == '/':
+                self.output_dir = output_dir[:-1]
 
     def make_output_dir(self):
         count = 0
         while True:
             try:
                 os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
-                self.ID = '_' + str(count)
+                self.output_dir = lda_directory_path + '/output/' + timestamp +'_' + str(count)
                 break
             except FileExistsError:
                 pass
             count += 1
 
     def execute_estimation(self, topic_num):
-        output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
+        output_dir = self.output_dir + '/K_'+str(topic_num)
         try:
             os.mkdir(output_dir)
         except FileExistsError:
@@ -66,23 +68,18 @@ class VLBCalculator():
                                         algorythm_flag=2, conv_det=self.conv_det)
         subprocess.call(command.split(' '),
                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        # p = subprocess.Popen(command.split(' '),
-                        # stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # print(p.communicate())
 
     def derive_VLB_each_topic_num(self):
-        BOW, _ = make_bag_of_words_num(self.BOW_filename)
-        words_num = 0
-        for document in BOW:
-            words_num += len(document)
-        vlb_list = []
         for topic_num in range(self.k_min, self.k_max, self.kstep):
-            VLB = np.loadtxt(lda_directory_path+'/output/'+
-                             timestamp+self.ID+'/K_'+str(topic_num)+'/variationalLowerBound.csv')
-            print('{0},{1}'.format(topic_num, VLB))
+            try:
+                VLB = np.loadtxt(self.output_dir+'/K_'+str(topic_num)+'/variationalLowerBound.csv')
+                print('{0},{1}'.format(topic_num, VLB))
+            except FileNotFoundError:
+                print('{0},{1}'.format(topic_num, 'Error'))
 
     def run(self):
-        self.make_output_dir()
+        if not os.path.isdir(self.output_dir):
+            self.make_output_dir()
         pool = Pool(processes=4)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
@@ -96,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument("k_max", help="max number of topics for calculation of maximized variational lower bound", type=int)
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of maximized variational lower bound", type=int, default=1)
     parser.add_argument("-d", "--conv_det", help="convergence determination for vb algorythm", type=float, default=0.001)
+    parser.add_argument("-o", "--output_dir", help="directory", type=str, default='')
     args = parser.parse_args()
-    calculator = VLBCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.conv_det)
-    calculator.run()
+    deriver = VLBDeriver(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.conv_det, args.output_dir)
+    deriver.run()

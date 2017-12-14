@@ -141,9 +141,9 @@ vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsig
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
-    vector<vector<double> > _nkvBuf(_nkv.size()), _ndkBuf(_ndk.size());
-    for(int k=0;k<_nkv.size();k++)_nkvBuf[k].assign(_V, 0);
-    for(int d=0;d<_ndk.size();d++)_ndkBuf[d].assign(_K, 0);
+    vector<vector<double> > nkvBuf(_nkv.size()), ndkBuf(_ndk.size());
+    for(int k=0;k<_nkv.size();k++)nkvBuf[k].assign(_V, 0);
+    for(int d=0;d<_ndk.size();d++)ndkBuf[d].assign(_K, 0);
     _variationalLowerBoundOfQz = 0;
     for(int d=0;d<_bagOfWordsNum.size();d++){
         for(int i=0;i<_bagOfWordsNum[d].size();i++){
@@ -151,22 +151,22 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
             qzdi = calculateQz(d, i);
             double temp = 0;
             for(int k=0; k<_K; k++){
-                _ndkBuf[d][k] += qzdi[k];
-                _nkvBuf[k][_bagOfWordsNum[d][i]] += qzdi[k];
+                ndkBuf[d][k] += qzdi[k];
+                nkvBuf[k][_bagOfWordsNum[d][i]] += qzdi[k];
                 _variationalLowerBoundOfQz += qzdi[k] * log(qzdi[k]);
             }
         }
     }
     for(int d=0;d<_bagOfWordsNum.size();d++){
         for(int k=0;k<_K;k++){
-            _ndk[d][k] = _ndkBuf[d][k];
+            _ndk[d][k] = ndkBuf[d][k];
         }
     }
     for(int k=0;k<_K;k++){
         _nk[k] = 0;
         for(int v=0;v<_V;v++){
-            _nkv[k][v] = _nkvBuf[k][v];
-            _nk[k] += _nkvBuf[k][v];
+            _nkv[k][v] = nkvBuf[k][v];
+            _nk[k] += nkvBuf[k][v];
         }
     }
 
