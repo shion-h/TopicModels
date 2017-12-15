@@ -35,12 +35,12 @@ timestamp = dt.now().strftime('%m%d_%a_%H_%M')
 
 
 class WBICCalculator():
-    def __init__(self, BOW_filename, k_min, k_max, kstep, iteration):
+    def __init__(self, BOW_filename, k_min, k_max, kstep, conv_det):
         self.BOW_filename = BOW_filename
         self.k_min = int(k_min)
         self.k_max = int(k_max)
         self.kstep = int(kstep)
-        self.iteration = int(iteration)
+        self.conv_det = int(conv_det)
         self.ID = ''
 
     def make_output_dir(self):
@@ -60,9 +60,9 @@ class WBICCalculator():
             os.mkdir(output_dir)
         except FileExistsError:
             pass
-        command = create_command_string(topic_num, lda_directory_path, 
-                                        output_dir, self.BOW_filename, 
-                                        iteration=self.iteration)
+        command = create_command_string(topic_num,lda_directory_path,
+                                        output_dir,self.BOW_filename,
+                                        conv_det=self.conv_det)
         subprocess.call(command.split(' '),
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT)
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     parser.add_argument("k_min", help="minimum number of topics for calculation of wbic", type=int)
     parser.add_argument("k_max", help="max number of topics for calculation of wbic", type=int)
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of wbic", type=int, default=1)
-    parser.add_argument("-i", "--iteration", help="number of iterations(>10)", default=100)
+    parser.add_argument("-d", "--conv_det", help="convergence determination", type=float, default=0.001)
     args = parser.parse_args()
-    calculator = WBICCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.iteration)
+    calculator = WBICCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.conv_det)
     calculator.run()

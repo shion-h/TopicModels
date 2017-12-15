@@ -17,24 +17,9 @@ After installation of it, you should execute following commands.
 Options:  
   - -h [ --help ]:             show help  
   - -k [ --nmtp ] arg (=10):   number of topics  
-  - -s [ --nmit ] arg (=1000): number of iterations  
-  - -b [ --bnin ] arg:         burn in period  
-  - -i [ --intv ] arg (=10):   sampling interval  
-  - -l [ --lrna ] arg (=1):    learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)  
   - -f [ --nmsh ] arg (=5):    number of factors with high probability to show  
   - -o [ --otpt ] arg (=./):   directory name for output  
   
-## Author-Topic Model
- ATM [BOW file] [Author file] [-options]  
-  
-Options:  
-  - -h [ --help ]:             show help  
-  - -k [ --nmtp ] arg (=10):   number of topics  
-  - -s [ --nmit ] arg (=1000): number of iterations  
-  - -b [ --bnin ] arg:         burn in period  
-  - -i [ --intv ] arg (=10):   sampling interval  
-  - -f [ --nmsh ] arg (=5):    number of factors with high probability to show  
-  - -o [ --otpt ] arg (=./):   directory name for output  
 # Input
   Input file is required to be frequency matrix format. See data/test.csv.  
 # Output
@@ -45,12 +30,6 @@ Options:
   3)hyper parameters(alpha.csv, beta.csv)  
   4)word list(wordList)  
   ( 5)vatiational lower bound(variationalLowerBound))  
-## ATM
-  1)topic distribution(theta.csv)  
-  2)word distribution(phi.csv)  
-  3)hyper parameters(alpha.csv, beta.csv)  
-  4)word list(wordList)  
-  5)author list (authorList)  
 # Scripts
   You can also use python scripts. These scripts calculate some values of each number of topics.  
 ## Usage
@@ -67,7 +46,7 @@ optional arguments:
   - -h, --help:            show this help message and exit  
   - -s KSTEP, --kstep KSTEP: step number of topics for calculation of perplexity  
   - -r RATE, --rate RATE:  rate of train data  
-  - -i ITERATION, --iteration ITERATION: number of iterations(>10)  
+  - -d CONV_DET, --conv_det CONV_DET: convergence determination
   
 ### WBIC
 calcldawbic.py [-h] [-s KSTEP] [-i ITERATION] BOW_filename k_min k_max  
@@ -80,9 +59,9 @@ positional arguments:
 optional arguments:  
   - -h, --help:            show this help message and exit  
   - -s KSTEP, --kstep KSTEP: step number of topics for calculation of wbic  
-  - -i ITERATION, --iteration ITERATION: number of iterations(>10)  
+  - -d CONV_DET, --conv_det CONV_DET: convergence determination
   
-calcldavlb.py [-h] [-s KSTEP] BOW_filename k_min k_max  
+deriveldavlb.py [-h] [-s KSTEP] BOW_filename k_min k_max  
   
 ### Maximized variational lower bound
 positional arguments:  
@@ -93,6 +72,8 @@ positional arguments:
 optional arguments:  
   - -h, --help:            show this help message and exit  
   - -s KSTEP, --kstep KSTEP: step number of topics for calculation of maximized variational lower bound  
+  - -d CONV_DET, --conv_det CONV_DET: convergence determination
+  - -o OUTPUT_DIR, --output_dir OUTPUT_DIR: output directory
 ## Output
 These scripts output results to /output/(time stamp) directory. (time stamp) means date information of MMDD_DAY_hh_mm_ss format.  
 # License

@@ -65,7 +65,7 @@ class VLBDeriver():
             pass
         command = create_command_string(topic_num,lda_directory_path,
                                         output_dir,self.BOW_filename,
-                                        algorythm_flag=2, conv_det=self.conv_det)
+                                        conv_det=self.conv_det)
         subprocess.call(command.split(' '),
                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
@@ -92,8 +92,8 @@ if __name__ == '__main__':
     parser.add_argument("k_min", help="minimum number of topics for calculation of maximized variational lower bound", type=int)
     parser.add_argument("k_max", help="max number of topics for calculation of maximized variational lower bound", type=int)
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of maximized variational lower bound", type=int, default=1)
-    parser.add_argument("-d", "--conv_det", help="convergence determination for vb algorythm", type=float, default=0.001)
-    parser.add_argument("-o", "--output_dir", help="directory", type=str, default='')
+    parser.add_argument("-d", "--conv_det", help="convergence determination", type=float, default=0.001)
+    parser.add_argument("-o", "--output_dir", help="output directory", type=str, default='')
     args = parser.parse_args()
     deriver = VLBDeriver(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.conv_det, args.output_dir)
     deriver.run()

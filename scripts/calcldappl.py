@@ -24,6 +24,7 @@ import argparse
 import subprocess
 import numpy as np
 import pandas as pd
+from multiprocessing import Pool
 from datetime import datetime as dt
 from iomodule import create_command_string, parse_result
 from bowmodule import make_bag_of_words_num, make_frequency_matrix
@@ -53,7 +54,7 @@ def calculate_perplexity(theta, phi, test_BOW, test_words_num=0):
 
 
 class PerplexityCalculator():
-    def __init__(self, BOW_filename, k_min, k_max, kstep, rate_of_train_data, iteration):
+    def __init__(self, BOW_filename, k_min, k_max, kstep, rate_of_train_data, conv_det):
         if (float(rate_of_train_data)>1) & (float(rate_of_train_data)<=0):
             exit()
         self.BOW, self.word_list = make_bag_of_words_num(BOW_filename)
@@ -61,7 +62,7 @@ class PerplexityCalculator():
         self.k_max = int(k_max)
         self.kstep = int(kstep)
         self.rate_of_train_data = float(rate_of_train_data)
-        self.iteration = int(iteration)
+        self.conv_det = int(conv_det)
         self.ID = ''
 
     def make_output_dir(self):
@@ -97,7 +98,7 @@ class PerplexityCalculator():
                               lda_directory_path+'/data/' + timestamp + self.ID + '/testBOW')
         self.test_BOW = test_BOW
 
-    def execute_estimation(self):
+    def execute_estimation(self, topic_num):
         output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
         try:
             os.mkdir(output_dir)
@@ -106,7 +107,7 @@ class PerplexityCalculator():
         command = create_command_string(topic_num, lda_directory_path,
                                         output_dir,
                                         lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW', 
-                                        iteration=self.iteration)
+                                        conv_det=self.conv_det)
         subprocess.call(command.split(' '),
                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
@@ -125,8 +126,8 @@ class PerplexityCalculator():
 
 
     def run(self):
-        self.split_train_test()
         self.make_output_dir()
+        self.split_train_test()
         pool = Pool(processes=4)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     parser.add_argument("k_max", help="max number of topics for calculation of perplexity", type=int)
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of perplexity", type=int, default=1)
     parser.add_argument("-r", "--rate", help="rate of train data", default=0.7)
-    parser.add_argument("-i", "--iteration", help="number of iterations(>10)", default=100)
+    parser.add_argument("-d", "--conv_det", help="convergence determination", type=float, default=0.001)
     args = parser.parse_args()
-    calculator = PerplexityCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.rate, args.iteration)
+    calculator = PerplexityCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.rate, args.conv_det)
     calculator.run()
