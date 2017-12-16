@@ -8,6 +8,9 @@
 //
 
 #include "include/LDAWBICMetropolisSampler.hpp"
+
+using namespace std;
+
 int main(int argc, char *argv[]){
     BOWFileParser parser(argv[1]);
     parser.readBOWFile();

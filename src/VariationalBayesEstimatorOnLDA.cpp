@@ -99,6 +99,8 @@ void VariationalBayesEstimatorOnLDA::initializeParam(){//{{{
 void VariationalBayesEstimatorOnLDA::initializeHyperParam(){//{{{
     _alpha.assign(_K, 0.1);
     _beta.assign(_V, 0.05);
+    _alphaTimeSeries.push_back(_alpha);
+    _betaTimeSeries.push_back(_beta);
     this->calculateHyperParamSum();
 }//}}}
 
@@ -192,6 +194,9 @@ void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
     }
     _betaUpdated=numerator/denominator/_V;
     _beta.assign(_V, _betaUpdated);
+
+    _alphaTimeSeries.push_back(_alpha);
+    _betaTimeSeries.push_back(_beta);
     this->calculateHyperParamSum();
 }//}}}
 
@@ -382,12 +387,22 @@ void VariationalBayesEstimatorOnLDA::writeParameter(string thetaFilename, string
         }
         phiOutput<<endl;
     }
-    for(int i=0;i<_alpha.size();i++){
-        alphaOutput<<_alpha[i];
+    for(int i=0; i<_alphaTimeSeries.size(); i++){
+        for(int j=0; j<_alphaTimeSeries[i].size(); j++){
+            alphaOutput<<_alphaTimeSeries[i][j];
+            if(j != (_alphaTimeSeries[i].size()-1)){
+                alphaOutput<<',';
+            }
+        }
         alphaOutput<<endl;
     }
-    for(int i=0;i<_beta.size();i++){
-        betaOutput<<_beta[i];
+    for(int i=0; i<_betaTimeSeries.size(); i++){
+        for(int j=0; j<_betaTimeSeries[i].size(); j++){
+            betaOutput<<_betaTimeSeries[i][j];
+            if(j != (_betaTimeSeries[i].size()-1)){
+                betaOutput<<',';
+            }
+        }
         betaOutput<<endl;
     }
     thetaOutput.close();

@@ -9,6 +9,7 @@
 
 #include "include/LDAWBICMetropolisSampler.hpp"
 
+using namespace std;
 
 vector<vector<double> > prod(const vector<vector<double> > &theta, const vector<vector<double> > &phi){
     unsigned int D=theta.size(), K=phi.size(), V=phi[0].size();

@@ -12,21 +12,19 @@
 #include<boost/math/special_functions/gamma.hpp>
 #include"BOWFileParser.hpp"
 
-using namespace std;
 
+std::vector<std::vector<double> > prod(const std::vector<std::vector<double> > &theta, const std::vector<std::vector<double> > &phi);
 
-vector<vector<double> > prod(const vector<vector<double> > &theta, const vector<vector<double> > &phi);
+double calculateLogLikelihood(const std::vector<std::vector<double> > &theta, const std::vector<std::vector<double> > &phi, const std::vector<std::vector<unsigned int> > &BOW);
 
-double calculateLogLikelihood(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<vector<unsigned int> > &BOW);
+double calculateDirichletLogPdf(std::vector<double> probVar, std::vector<double> param);
 
-double calculateDirichletLogPdf(vector<double> probVar, vector<double> param);
-
-double calculateLogPriorValue(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<double> alpha, const vector<double> beta);
+double calculateLogPriorValue(const std::vector<std::vector<double> > &theta, const std::vector<std::vector<double> > &phi, const std::vector<double> alpha, const std::vector<double> beta);
 
 double calculateTargetDistributionValue(const double &logLikelihood, const double &logPriorValue, const unsigned int &n);
 
-vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> > &param, const unsigned int &N);
+std::vector<std::vector<double> > samplingParamFromDirichlet(const std::vector<std::vector<double> > &param, const unsigned int &N);
 
-double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n=0);
+double runWBICMetropolis(const std::vector<std::vector<unsigned int> > &BOW, const std::vector<double> &alpha, const std::vector<double> &beta, unsigned int n=0);
 
-vector<double> readHyperParam(string hyperParamFilename);
+std::vector<double> readHyperParam(std::string hyperParamFilename);

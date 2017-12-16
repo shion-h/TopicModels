@@ -14,25 +14,23 @@
 #include<vector>
 #include<fstream>
 
-using namespace std;
-
 class BOWFileParser{
 protected:
-    ifstream _inputText;
-    vector<string> _wordList;
+    std::ifstream _inputText;
+    std::vector<std::string> _wordList;
     unsigned int _V;
-    vector<vector<unsigned int> > _frequencyMatrix;
-    vector<vector<unsigned int> > _bagOfWordsNum;
+    std::vector<std::vector<unsigned int> > _frequencyMatrix;
+    std::vector<std::vector<unsigned int> > _bagOfWordsNum;
 public:
-    BOWFileParser(string filename);
+    BOWFileParser(std::string filename);
     ~BOWFileParser();
     void readBOWFile();
     void makeBagOfWordsNum();
-    void writeWordList(string wordListFilename)const;
-    const vector<vector<unsigned int> > &getBagOfWordsNum()const{
+    void writeWordList(std::string wordListFilename)const;
+    const std::vector<std::vector<unsigned int> > &getBagOfWordsNum()const{
         return _bagOfWordsNum;
     }
-    const vector<string> &getWordList()const{
+    const std::vector<std::string> &getWordList()const{
         return _wordList;
     }
     const unsigned int &getV()const{
