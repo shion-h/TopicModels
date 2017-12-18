@@ -26,11 +26,11 @@ int main(int argc, char *argv[]){
     opt.add_options()
     ("help,h", "show help")
     ("nmtp,k", boost::program_options::value<unsigned int>()->default_value(10), "number of topics")
-    ("nmit,s", boost::program_options::value<unsigned int>()->default_value(1000), "number of iterations(only used by sampling algorythm)")
-    ("bnin,b", boost::program_options::value<unsigned int>(), "burn in period(only used by sampling algorythm)")
-    ("intv,i", boost::program_options::value<unsigned int>()->default_value(10), "sampling interval(only used by sampling algorythm)")
-    ("cdrt,d", boost::program_options::value<double>()->default_value(0.001), "convergence ditermination rate(only used by VB algorythm)")
-    ("lrna,l", boost::program_options::value<unsigned int>()->default_value(1), "learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)")
+    ("nmit,s", boost::program_options::value<unsigned int>()->default_value(1000), "number of iterations(only used by sampling algorithm)")
+    ("bnin,b", boost::program_options::value<unsigned int>(), "burn in period(only used by sampling algorithm)")
+    ("intv,i", boost::program_options::value<unsigned int>()->default_value(10), "sampling interval(only used by sampling algorithm)")
+    ("cdrt,d", boost::program_options::value<double>()->default_value(0.001), "convergence ditermination rate(only used by VB algorithm)")
+    ("lrna,l", boost::program_options::value<unsigned int>()->default_value(1), "learning algorithm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)")
     ("nmsh,f", boost::program_options::value<unsigned int>()->default_value(5), "number of factors with high probability to show")
     ("otpt,o", boost::program_options::value<string>()->default_value("./"), "directory name for output")
     ;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     unsigned int burnIn;
     unsigned int samplingInterval;
     double convergenceDiterminationRate;
-    unsigned int learningAlgorythmFlag;
+    unsigned int learningAlgorithmFlag;
     unsigned int numOfTopFactor;
     string outputDirectory;
     string thetaFilename;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]){
         else burnIn = static_cast<int>(S*0.8);
         if(vm.count("intv"))samplingInterval = vm["intv"].as<unsigned int>();
         if(vm.count("cdrt"))convergenceDiterminationRate = vm["cdrt"].as<double>();
-        if(vm.count("lrna"))learningAlgorythmFlag = vm["lrna"].as<unsigned int>();
+        if(vm.count("lrna"))learningAlgorithmFlag = vm["lrna"].as<unsigned int>();
         if(vm.count("nmsh"))numOfTopFactor = vm["nmsh"].as<unsigned int>();
         if(vm.count("otpt"))outputDirectory = vm["otpt"].as<std::string>();
         if(outputDirectory[outputDirectory.size()-1] != '/')outputDirectory.push_back('/');
@@ -105,12 +105,12 @@ int main(int argc, char *argv[]){
     cout<<"filename = "<<BOWFilename<<' ';
     cout<<"K = "<<K<<' ';
     cout<<"V = "<<V<<' ';
-    cout<<"learningAlgorythmFlag = "<<learningAlgorythmFlag<<' ';
-    if(learningAlgorythmFlag == 0 || learningAlgorythmFlag == 1){
+    cout<<"learningAlgorithmFlag = "<<learningAlgorithmFlag<<' ';
+    if(learningAlgorithmFlag == 0 || learningAlgorithmFlag == 1){
         cout<<"iterationTimes = "<<S<<' ';
         cout<<"burnIn = "<<burnIn<<' ';
         cout<<"samplingInterval = "<<samplingInterval<<' ';
-    }else if(learningAlgorythmFlag == 2){
+    }else if(learningAlgorithmFlag == 2){
         cout<<"convergenceDiterminationRate = "<<convergenceDiterminationRate<<' ';
     }
     cout<<"thetaFilename = "<<thetaFilename<<' ';
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]){
     //}}}
 
 //estimation{{{
-    if(learningAlgorythmFlag == 2){
+    if(learningAlgorithmFlag == 2){
         VariationalBayesEstimatorOnLDA *estimator;
         estimator = new VariationalBayesEstimatorOnLDA(bagOfWordsNum, parser.getWordList(), K, V, convergenceDiterminationRate);
         estimator->runIteraions();
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]){
         }
         // shared_ptr<GibbsSamplerFromLDA> gibbsSampler;
         GibbsSamplerFromLDA *gibbsSampler;
-        switch(learningAlgorythmFlag){
+        switch(learningAlgorithmFlag){
             case 0:
                 // gibbsSampler = make_shared<OrdinaryGibbsSamplerFromLDA>(bagOfWordsNum, K, V, nThIterationSample);
                 gibbsSampler = new OrdinaryGibbsSamplerFromLDA(bagOfWordsNum, parser.getWordList(), K, V, nThIterationSample);

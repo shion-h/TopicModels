@@ -20,7 +20,7 @@ Options:
   - -s [ --nmit ] arg (=1000): number of iterations  
   - -b [ --bnin ] arg:         burn in period  
   - -i [ --intv ] arg (=10):   sampling interval  
-  - -l [ --lrna ] arg (=1):    learning algorythm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)  
+  - -l [ --lrna ] arg (=1):    learning algorithm(0:Gibbs sampling 1:Collapsed gibbs sampling 2:Variational Bayes)  
   - -f [ --nmsh ] arg (=5):    number of factors with high probability to show  
   - -o [ --otpt ] arg (=./):   directory name for output  
   
