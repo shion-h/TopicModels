@@ -45,7 +45,7 @@ public:
     virtual void initializeParam();
     virtual void calculateEx();
     virtual void calculateHyperParamSum();
-    virtual std::vector<double> calculateQz(unsigned int d, unsigned int i);
+    virtual std::vector<double> calculateQz(unsigned int d, unsigned int i)const;
     virtual void nExUpdate();
     virtual void hyperParamUpdate();
     virtual double calculateVariationalLowerBound();

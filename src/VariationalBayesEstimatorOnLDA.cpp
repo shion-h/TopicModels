@@ -125,7 +125,7 @@ void VariationalBayesEstimatorOnLDA::calculateHyperParamSum(){//{{{
     _betaSum=accumulate(_beta.begin(), _beta.end(), 0.0);
 }//}}}
 
-vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsigned int i){//{{{
+vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsigned int i)const{//{{{
     vector<double> qzdi;
     double Zq = 0;
     for(int k=0; k<_K; k++){
@@ -150,7 +150,7 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
     for(int d=0;d<_bagOfWordsNum.size();d++){
         for(int i=0;i<_bagOfWordsNum[d].size();i++){
             vector<double> qzdi;
-            qzdi = calculateQz(d, i);
+            qzdi = this->calculateQz(d, i);
             double temp = 0;
             for(int k=0; k<_K; k++){
                 ndkBuf[d][k] += qzdi[k];
@@ -437,8 +437,8 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
         }
         prevVariationalLowerBound = thisVariationalLowerBound;
         this->nExUpdate();
-        this->hyperParamUpdate();
         thisVariationalLowerBound = this->calculateVariationalLowerBound();
+        this->hyperParamUpdate();
         cout<<"VLB"<<thisVariationalLowerBound<<endl;
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
         count++;
