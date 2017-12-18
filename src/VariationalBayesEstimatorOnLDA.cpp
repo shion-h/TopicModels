@@ -430,18 +430,18 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
     double thisVariationalLowerBound = 0;
     unsigned int count = 0;
     while(1){
+        prevVariationalLowerBound = thisVariationalLowerBound;
+        this->nExUpdate();
+        thisVariationalLowerBound = this->calculateVariationalLowerBound();
+        cout<<"VLB"<<thisVariationalLowerBound<<endl;
+        _VLBTimeSeries.push_back(thisVariationalLowerBound);
+        count++;
         if(count<2){
         }else if((thisVariationalLowerBound - prevVariationalLowerBound) / abs(thisVariationalLowerBound) < _convergenceDiterminationRate){
             _variationalLowerBound = thisVariationalLowerBound;
             break;
         }
-        prevVariationalLowerBound = thisVariationalLowerBound;
-        this->nExUpdate();
-        thisVariationalLowerBound = this->calculateVariationalLowerBound();
         this->hyperParamUpdate();
-        cout<<"VLB"<<thisVariationalLowerBound<<endl;
-        _VLBTimeSeries.push_back(thisVariationalLowerBound);
-        count++;
     }
     this->calculateEx();
     cout<<"iter:"<<count<<endl;
