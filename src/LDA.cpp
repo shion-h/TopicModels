@@ -103,7 +103,6 @@ int main(int argc, char *argv[]){
     estimator->runIteraions();
     estimator->writeParameter(thetaFilename, phiFilename, alphaFilename, betaFilename);
     estimator->writeVariationalLowerBound(VLBFilename, VLBTimeSeriesFilename);
-    estimator->printTopFactor(numOfTopFactor);
     delete estimator;
 //}}}
     return 0;

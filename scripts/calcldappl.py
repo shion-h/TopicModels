@@ -128,7 +128,7 @@ class PerplexityCalculator():
     def run(self):
         self.make_output_dir()
         self.split_train_test()
-        pool = Pool(processes=4)
+        pool = Pool(processes=5)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
         self.calculate_perplexity_each_topic_num()

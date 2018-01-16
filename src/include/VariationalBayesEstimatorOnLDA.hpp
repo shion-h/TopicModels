@@ -21,6 +21,7 @@
 #include<fstream>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include"utils.hpp"
 
 
 class VariationalBayesEstimatorOnLDA{
@@ -46,9 +47,10 @@ public:
     virtual void calculateEx();
     virtual void calculateHyperParamSum();
     virtual std::vector<double> calculateQz(unsigned int d, unsigned int i)const;
-    virtual void nExUpdate();
-    virtual void hyperParamUpdate();
-    virtual double calculateVariationalLowerBound();
+    virtual void updateNEx();
+    virtual void updateBeta(unsigned int isAsymmetry);
+    virtual void updateHyperParameters();
+    virtual double calculateVariationalLowerBound()const;
     virtual void printHyperParameter()const;
     virtual void printTopFactor(int numOfTopFactor)const;
     virtual void printThetaEx()const;

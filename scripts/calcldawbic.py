@@ -78,7 +78,7 @@ class WBICCalculator():
 
     def run(self):
         self.make_output_dir()
-        pool = Pool(processes=4)
+        pool = Pool(processes=5)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
         _ = pool.map(self.calculate_WBIC,

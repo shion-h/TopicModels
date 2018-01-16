@@ -80,7 +80,7 @@ class VLBDeriver():
     def run(self):
         if not os.path.isdir(self.output_dir):
             self.make_output_dir()
-        pool = Pool(processes=4)
+        pool = Pool(processes=5)
         _ = pool.map(self.execute_estimation,
                  range(self.k_min, self.k_max, self.kstep))
         self.derive_VLB_each_topic_num()

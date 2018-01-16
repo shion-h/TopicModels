@@ -142,7 +142,7 @@ vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsig
     return(qzdi);
 }//}}}
 
-void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
+void VariationalBayesEstimatorOnLDA::updateNEx(){//{{{
     vector<vector<double> > nkvBuf(_nkv.size()), ndkBuf(_ndk.size());
     for(int k=0;k<_nkv.size();k++)nkvBuf[k].assign(_V, 0);
     for(int d=0;d<_ndk.size();d++)ndkBuf[d].assign(_K, 0);
@@ -174,7 +174,36 @@ void VariationalBayesEstimatorOnLDA::nExUpdate(){//{{{
 
 }//}}}
 
-void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
+void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){
+    double numerator=0, denominator=0;
+    if(isAsymmetry == 0){
+        double commonBeta;
+        numerator=0;
+        denominator=0;
+        for(int k=0;k<_K;k++){
+            for(int v=0;v<_V;v++){
+                numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
+            }
+            denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
+        }
+        commonBeta = numerator/denominator/_V;
+        _beta.assign(_V, commonBeta);
+    }else{
+        double _bupdateEtad;
+        numerator=0;
+        denominator=0;
+        for(int v=0;v<_V;v++){
+            for(int k=0;k<_K;k++){
+                numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
+                denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
+            }
+            _beta[v] = numerator/denominator;
+        }
+    }
+    _betaTimeSeries.push_back(_beta);
+}
+
+void VariationalBayesEstimatorOnLDA::updateHyperParameters(){//{{{
     double numerator=0, denominator=0;
     for(int k=0;k<_K;k++){
         for(int d=0;d<_bagOfWordsNum.size();d++){
@@ -183,24 +212,12 @@ void VariationalBayesEstimatorOnLDA::hyperParamUpdate(){//{{{
         }
         _alpha[k]=numerator/denominator;
     }
-    double _betaUpdated;
-    numerator=0;
-    denominator=0;
-    for(int k=0;k<_K;k++){
-        for(int v=0;v<_V;v++){
-            numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
-        }
-        denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
-    }
-    _betaUpdated=numerator/denominator/_V;
-    _beta.assign(_V, _betaUpdated);
-
     _alphaTimeSeries.push_back(_alpha);
-    _betaTimeSeries.push_back(_beta);
+    this->updateBeta(1);
     this->calculateHyperParamSum();
 }//}}}
 
-double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound(){//{{{
+double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{{{
     double term1=0, term2=0;
     for(int k=0; k<_K; k++){
         term1 += boost::math::lgamma(_betaSum) - boost::math::lgamma(_nk[k]+_betaSum);
@@ -359,56 +376,10 @@ void VariationalBayesEstimatorOnLDA::printNum()const{//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::writeParameter(string thetaFilename, string phiFilename, string alphaFilename, string betaFilename)const{//{{{
-    ofstream thetaOutput;
-    ofstream phiOutput;
-    ofstream alphaOutput;
-    ofstream betaOutput;
-    thetaOutput.open(thetaFilename, ios::out);
-    phiOutput.open(phiFilename, ios::out);
-    alphaOutput.open(alphaFilename, ios::out);
-    betaOutput.open(betaFilename, ios::out);
-
-    for(int i=0;i<_thetaEx.size();i++){
-        for(int j=0;j<_thetaEx[i].size();j++){
-            thetaOutput<<_thetaEx[i][j];
-            if(j!=(_thetaEx[i].size()-1)){
-                thetaOutput<<',';
-            }
-        }
-        thetaOutput<<endl;
-    }
-
-    for(int i=0;i<_phiEx.size();i++){
-        for(int j=0;j<_phiEx[i].size();j++){
-            phiOutput<<_phiEx[i][j];
-            if(j!=(_phiEx[i].size()-1)){
-                phiOutput<<',';
-            }
-        }
-        phiOutput<<endl;
-    }
-    for(int i=0; i<_alphaTimeSeries.size(); i++){
-        for(int j=0; j<_alphaTimeSeries[i].size(); j++){
-            alphaOutput<<_alphaTimeSeries[i][j];
-            if(j != (_alphaTimeSeries[i].size()-1)){
-                alphaOutput<<',';
-            }
-        }
-        alphaOutput<<endl;
-    }
-    for(int i=0; i<_betaTimeSeries.size(); i++){
-        for(int j=0; j<_betaTimeSeries[i].size(); j++){
-            betaOutput<<_betaTimeSeries[i][j];
-            if(j != (_betaTimeSeries[i].size()-1)){
-                betaOutput<<',';
-            }
-        }
-        betaOutput<<endl;
-    }
-    thetaOutput.close();
-    phiOutput.close();
-    alphaOutput.close();
-    betaOutput.close();
+    outputVector(_thetaEx, thetaFilename);
+    outputVector(_phiEx, phiFilename);
+    outputVector(_alphaTimeSeries, alphaFilename);
+    outputVector(_betaTimeSeries, betaFilename);
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilename, string VLBTimeSeriesFilename)const{//{{{
@@ -431,7 +402,7 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
     unsigned int count = 0;
     while(1){
         prevVariationalLowerBound = thisVariationalLowerBound;
-        this->nExUpdate();
+        this->updateNEx();
         thisVariationalLowerBound = this->calculateVariationalLowerBound();
         cout<<"VLB"<<thisVariationalLowerBound<<endl;
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
@@ -441,7 +412,7 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
             _variationalLowerBound = thisVariationalLowerBound;
             break;
         }
-        this->hyperParamUpdate();
+        this->updateHyperParameters();
     }
     this->calculateEx();
     cout<<"iter:"<<count<<endl;
