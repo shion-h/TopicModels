@@ -181,24 +181,25 @@ void VariationalBayesEstimatorOnLDA::updateNEx(){//{{{
 void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){//{{{
     double numerator=0, denominator=0;
     if(isAsymmetry == 0){
-        double commonBeta;
         numerator=0;
         denominator=0;
         for(int k=0;k<_K;k++){
             for(int v=0;v<_V;v++){
-                numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
+                numerator += (boost::math::digamma(_nkv[k][v]+_beta[v]) - boost::math::digamma(_beta[v]))*_beta[v];
             }
-            denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
+            denominator += boost::math::digamma(_nk[k]+_betaSum) - boost::math::digamma(_betaSum);
         }
-        commonBeta = numerator/denominator/_V;
+        double commonBeta = numerator/denominator/_V;
         _beta.assign(_V, commonBeta);
     }else{
-        numerator=0;
         denominator=0;
+        for(int k=0;k<_K;k++){
+            denominator += boost::math::digamma(_nk[k]+_betaSum) - boost::math::digamma(_betaSum);
+        }
         for(int v=0;v<_V;v++){
+            numerator=0;
             for(int k=0;k<_K;k++){
-                numerator+=(boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
-                denominator+=boost::math::digamma(_nk[k]+_betaSum)-boost::math::digamma(_betaSum);
+                numerator += (boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
             }
             _beta[v] = numerator/denominator;
         }
@@ -207,13 +208,16 @@ void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){//{{{
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::updateHyperParameters(){//{{{
-    double numerator=0, denominator=0;
+    double denominator=0;
+    for(int d=0;d<_bagOfWordsNum.size();d++){
+        denominator += boost::math::digamma(_nd[d]+_alphaSum) - boost::math::digamma(_alphaSum);
+    }
     for(int k=0;k<_K;k++){
+        double numerator=0;
         for(int d=0;d<_bagOfWordsNum.size();d++){
-            numerator+=(boost::math::digamma(_ndk[d][k]+_alpha[k])-boost::math::digamma(_alpha[k]))*_alpha[k];
-            denominator+=boost::math::digamma(_nd[d]+_alphaSum)-boost::math::digamma(_alphaSum);
+            numerator += (boost::math::digamma(_ndk[d][k]+_alpha[k])-boost::math::digamma(_alpha[k]))*_alpha[k];
         }
-        _alpha[k]=numerator/denominator;
+        _alpha[k] = numerator/denominator;
     }
     _alphaTimeSeries.push_back(_alpha);
     this->updateBeta(1);
@@ -235,7 +239,6 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{
         }
     }
     double variationalLowerBound = term1 + term2 - _variationalLowerBoundOfQz;
-    cout<<term1<<' '<<term2<<' '<<_variationalLowerBoundOfQz<<endl;
     return(variationalLowerBound);
 }//}}}
 
@@ -411,9 +414,6 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
         cout<<"VLB"<<thisVariationalLowerBound<<endl;
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
         count++;
-        if(isnan(thisVariationalLowerBound)){
-            break;
-        }
         if(count<2){
         }else if((thisVariationalLowerBound - prevVariationalLowerBound) / abs(thisVariationalLowerBound) < _convergenceDiterminationRate){
             _variationalLowerBound = thisVariationalLowerBound;
