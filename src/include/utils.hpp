@@ -41,3 +41,15 @@ void outputVector(const std::vector<T> &vector, std::string filename){
     }
     stream.close();
 }
+
+template<typename T>
+void outputVectorForDebug(const std::vector<T> &vector, std::string msg){
+    std::ofstream stream;
+    stream.open("./check", std::ios::app);
+    stream<<msg<<std::endl;
+    for(int i=0; i<vector.size(); i++){
+        stream<<vector[i]<<',';
+    }
+    stream<<std::endl;
+    stream.close();
+}

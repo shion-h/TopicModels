@@ -17,6 +17,7 @@
 #include<numeric>
 #include<memory>
 #include<random>
+#include<limits>
 #include<iomanip>
 #include<fstream>
 #include <boost/math/special_functions/digamma.hpp>

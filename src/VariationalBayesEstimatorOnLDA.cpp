@@ -129,9 +129,13 @@ vector<double> VariationalBayesEstimatorOnLDA::calculateQz(unsigned int d, unsig
     vector<double> qzdi;
     double Zq = 0;
     for(int k=0; k<_K; k++){
-        double numerator=0, denominator=0;
-        numerator = exp(boost::math::digamma(_nkv[k][_bagOfWordsNum[d][i]]+_beta[_bagOfWordsNum[d][i]])) * exp(boost::math::digamma(_ndk[d][k]+_alpha[k]));
-        denominator = exp(boost::math::digamma(_nk[k])+_betaSum) * exp(boost::math::digamma(_nd[d]+_alphaSum));
+        double numerator = 0, denominator = 0;
+        double xikv = _nkv[k][_bagOfWordsNum[d][i]] + _beta[_bagOfWordsNum[d][i]];
+        double xidk = _ndk[d][k] + _alpha[k];
+        double xik = _nk[k] + _betaSum;
+        double xid = _nd[d] + _alphaSum;
+        numerator = exp(boost::math::digamma(xikv)) * exp(boost::math::digamma(xidk));
+        denominator = exp(boost::math::digamma(xik)) * exp(boost::math::digamma(xid));
         double constProbability = numerator / denominator;
         Zq += constProbability;
         qzdi.push_back(constProbability);
@@ -174,7 +178,7 @@ void VariationalBayesEstimatorOnLDA::updateNEx(){//{{{
 
 }//}}}
 
-void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){
+void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){//{{{
     double numerator=0, denominator=0;
     if(isAsymmetry == 0){
         double commonBeta;
@@ -189,7 +193,6 @@ void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){
         commonBeta = numerator/denominator/_V;
         _beta.assign(_V, commonBeta);
     }else{
-        double _bupdateEtad;
         numerator=0;
         denominator=0;
         for(int v=0;v<_V;v++){
@@ -201,7 +204,7 @@ void VariationalBayesEstimatorOnLDA::updateBeta(unsigned int isAsymmetry){
         }
     }
     _betaTimeSeries.push_back(_beta);
-}
+}//}}}
 
 void VariationalBayesEstimatorOnLDA::updateHyperParameters(){//{{{
     double numerator=0, denominator=0;
@@ -232,6 +235,7 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{
         }
     }
     double variationalLowerBound = term1 + term2 - _variationalLowerBoundOfQz;
+    cout<<term1<<' '<<term2<<' '<<_variationalLowerBoundOfQz<<endl;
     return(variationalLowerBound);
 }//}}}
 
@@ -407,6 +411,9 @@ void VariationalBayesEstimatorOnLDA::runIteraions(){//{{{
         cout<<"VLB"<<thisVariationalLowerBound<<endl;
         _VLBTimeSeries.push_back(thisVariationalLowerBound);
         count++;
+        if(isnan(thisVariationalLowerBound)){
+            break;
+        }
         if(count<2){
         }else if((thisVariationalLowerBound - prevVariationalLowerBound) / abs(thisVariationalLowerBound) < _convergenceDiterminationRate){
             _variationalLowerBound = thisVariationalLowerBound;
