@@ -27,16 +27,17 @@ vector<vector<double> > prod(const vector<vector<double> > &theta, const vector<
 }
 
 
-double calculateLogLikelihood(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<vector<unsigned int> > &BOW){
+double calculateLogLikelihood(const vector<vector<double> > &theta, const vector<vector<double> > &phi, const vector<vector<unsigned int> > &frequencyMatrix, const vector<vector<unsigned int> > &docVoca){
     double logLikelihood = 0.0;
-    unsigned int D=BOW.size(), V=phi[0].size();
+    unsigned int D=docVoca.size(), V=phi[0].size();
     vector<vector<double> > wordProbMat(D);
     for(int d=0;d<wordProbMat.size();d++)wordProbMat[d].assign(V,0);
     wordProbMat = prod(theta, phi);
     for(int d=0; d<D; d++){
         double documentLogLikelihood = 0.0;
-        for(int i=0; i<BOW[d].size(); i++){
-            documentLogLikelihood += log(wordProbMat[d][BOW[d][i]]);
+        for(int l=0; l<docVoca[d].size(); l++){
+            unsigned int m = frequencyMatrix[d][docVoca[d][l]];
+            documentLogLikelihood += log(wordProbMat[d][docVoca[d][l]]) * m;
         }
         logLikelihood += documentLogLikelihood;
     }
@@ -115,11 +116,13 @@ vector<vector<double> > samplingParamFromDirichlet(const vector<vector<double> >
 }
 
 
-double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<double> &alpha, const vector<double> &beta, unsigned int n){
-    unsigned int D = BOW.size(), K = alpha.size(), V = beta.size();
+double runWBICMetropolis(const vector<vector<unsigned int> > &frequencyMatrix, const vector<vector<unsigned int> > &docVoca, const vector<double> &alpha, const vector<double> &beta, unsigned int n){
+    unsigned int D = docVoca.size(), K = alpha.size(), V = beta.size();
     if(n==0){
         for(int d=0; d<D; d++){
-            n += BOW[d].size();
+            for(int v=0; v<V; v++){
+                n += frequencyMatrix[d][v];
+            }
         }
     }
     vector<vector<double> > alphaMatrix(D, alpha);
@@ -147,7 +150,7 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
     double logLikelihoodAverage = 0.0;
     vector<vector<double> > theta = samplingParamFromDirichlet(alphaMatrixUniform, D);
     vector<vector<double> > phi = samplingParamFromDirichlet(betaMatrixUniform, K);
-    double logLikelihood = calculateLogLikelihood(theta, phi, BOW);
+    double logLikelihood = calculateLogLikelihood(theta, phi, frequencyMatrix, docVoca);
     double logPriorDistributionValue = calculateLogPriorDistributionValue(theta, phi, alpha, beta);
     double logTargetDistributionValue = calculateLogTargetDistributionValue(logLikelihood, logPriorDistributionValue, n);
     // double logTargetDistributionValue = 0;
@@ -180,7 +183,7 @@ double runWBICMetropolis(const vector<vector<unsigned int> > &BOW, const vector<
                 betaMatrixCandidate[k][v] = phiCandidate[k][v] * (betaSum - V) + 1;
             }
         }
-        double logLikelihoodCandidate = calculateLogLikelihood(thetaCandidate, phiCandidate, BOW);
+        double logLikelihoodCandidate = calculateLogLikelihood(thetaCandidate, phiCandidate, frequencyMatrix, docVoca);
         double logPriorDistributionValueCandidate = calculateLogPriorDistributionValue(thetaCandidate, phiCandidate, alpha, beta);
         double logTargetDistributionValueCandidate = calculateLogTargetDistributionValue(logLikelihoodCandidate, logPriorDistributionValueCandidate, n);
         double logProposalDistributionValueToCandidate = calculateLogProposalDistributionValue(thetaCandidate, phiCandidate, alphaMatrix, betaMatrix);

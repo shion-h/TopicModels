@@ -25,6 +25,6 @@ double calculateTargetDistributionValue(const double &logLikelihood, const doubl
 
 std::vector<std::vector<double> > samplingParamFromDirichlet(const std::vector<std::vector<double> > &param, const unsigned int &N);
 
-double runWBICMetropolis(const std::vector<std::vector<unsigned int> > &BOW, const std::vector<double> &alpha, const std::vector<double> &beta, unsigned int n=0);
+double runWBICMetropolis(const std::vector<std::vector<unsigned int> > &frequencyMatrix, const std::vector<std::vector<unsigned int> > &docVoca, const std::vector<double> &alpha, const std::vector<double> &beta, unsigned int n=0);
 
 std::vector<double> readHyperParam(std::string hyperParamFilename);

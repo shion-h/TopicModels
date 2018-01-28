@@ -80,26 +80,12 @@ int main(int argc, char *argv[]){
     }
 
     BOWFileParser parser(BOWFilename);
-    parser.readBOWFile();
-    parser.makeBagOfWordsNum();
     parser.writeWordList(wordListFilename);
-    unsigned int V = parser.getV();
-    vector<vector<unsigned int> > bagOfWordsNum = parser.getBagOfWordsNum();
-
-    cout<<"filename = "<<BOWFilename<<' ';
-    cout<<"K = "<<K<<' ';
-    cout<<"V = "<<V<<' ';
-    cout<<"convergenceDiterminationRate = "<<convergenceDiterminationRate<<' ';
-    cout<<"thetaFilename = "<<thetaFilename<<' ';
-    cout<<"phiFilename = "<<phiFilename<<' ';
-    cout<<"alphaFilename = "<<alphaFilename<<' ';
-    cout<<"betaFilename = "<<betaFilename<<' ';
-    cout<<"wordListFilename = "<<wordListFilename<<endl;
     //}}}
 
 //estimation{{{
     VariationalBayesEstimatorOnLDA *estimator;
-    estimator = new VariationalBayesEstimatorOnLDA(bagOfWordsNum, parser.getWordList(), K, V, convergenceDiterminationRate);
+    estimator = new VariationalBayesEstimatorOnLDA(parser, K, convergenceDiterminationRate);
     estimator->runIteraions();
     estimator->writeParameter(thetaFilename, phiFilename, alphaFilename, betaFilename);
     estimator->writeVariationalLowerBound(VLBFilename, VLBTimeSeriesFilename);

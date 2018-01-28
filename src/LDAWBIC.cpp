@@ -13,15 +13,12 @@ using namespace std;
 
 int main(int argc, char *argv[]){
     BOWFileParser parser(argv[1]);
-    parser.readBOWFile();
-    parser.makeBagOfWordsNum();
-    vector<vector<unsigned int> > BOW = parser.getBagOfWordsNum();
     vector<double> alpha = readHyperParam(argv[2]);
     vector<double> beta = readHyperParam(argv[3]);
     unsigned int n;
     if(argc == 5){
         n = atoi(argv[4]);
     }
-    cout<<alpha.size()<<','<<runWBICMetropolis(BOW, alpha, beta)<<endl;
+    cout<<alpha.size()<<','<<runWBICMetropolis(parser.getFrequencyMatrix(), parser.getDocVoca(), alpha, beta)<<endl;
     return 0;
 }

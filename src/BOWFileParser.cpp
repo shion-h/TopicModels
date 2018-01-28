@@ -13,7 +13,8 @@
 using namespace std;
 
 BOWFileParser::BOWFileParser(string filename):_inputText(filename),_V(0){//{{{
-
+    this->readBOWFile();
+    this->makeDocVoca();
 }//}}}
 
 BOWFileParser::~BOWFileParser(){//{{{
@@ -22,7 +23,7 @@ BOWFileParser::~BOWFileParser(){//{{{
 
 void BOWFileParser::readBOWFile(){//{{{
     if(!_inputText){
-        cout<<"Can't open BOWfile";
+        cout<<"Cannot open BOWfile";
         exit(1);
     }
     string str;
@@ -49,15 +50,15 @@ void BOWFileParser::readBOWFile(){//{{{
     _V=_wordList.size();
 }//}}}
 
-void BOWFileParser::makeBagOfWordsNum(){//{{{
-    for(int i=0;i<_frequencyMatrix.size();i++){
-        vector<unsigned int> intVec;
-        for(int j=0;j<_frequencyMatrix[i].size();j++){
-            for(int k=0;k<_frequencyMatrix[i][j];k++){
-                intVec.push_back(j);
+void BOWFileParser::makeDocVoca(){//{{{
+    for(int d=0; d<_frequencyMatrix.size(); d++){
+        vector<unsigned int> docVocad;
+        for(int v=0; v<_frequencyMatrix[d].size(); v++){
+            if(_frequencyMatrix[d][v] > 0){
+                docVocad.push_back(v);
             }
         }
-        _bagOfWordsNum.push_back(intVec);
+        _docVoca.push_back(docVocad);
     }
 }//}}}
 
@@ -69,5 +70,4 @@ void BOWFileParser::writeWordList(string wordListFilename)const{//{{{
         if(v!=(_wordList.size()-1))wordListFp<<endl;
     }
     wordListFp.close();
-
 }//}}}
