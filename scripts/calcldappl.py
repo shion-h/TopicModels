@@ -26,14 +26,11 @@ import numpy as np
 import pandas as pd
 from multiprocessing import Pool
 from datetime import datetime as dt
-from iomodule import create_command_string, parse_result
+from msmodule import BaseLDATopicNumberSelector, lda_directory_path
 from bowmodule import make_bag_of_words_num, make_frequency_matrix
 
-lda_directory_path = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
-timestamp = dt.now().strftime('%m%d_%a_%H_%M')
 
-
-def calculate_log_likelihood(theta, phi, BOW):
+def calculate_lda_log_likelihood(theta, phi, BOW):
     log_likelihood = 0.0
     word_prob_df = theta.dot(phi)
     for d, document in enumerate(BOW):
@@ -44,37 +41,26 @@ def calculate_log_likelihood(theta, phi, BOW):
     return log_likelihood
 
 
-def calculate_perplexity(theta, phi, test_BOW, test_words_num=0):
+def calculate_lda_perplexity(theta, phi, test_BOW, test_words_num=0):
     if test_words_num == 0:
         for document in self.test_BOW:
             test_words_num += len(document)
-    log_likelihood = calculate_log_likelihood(theta, phi, test_BOW)
+    log_likelihood = calculate_lda_log_likelihood(theta, phi, test_BOW)
     perplexity = np.exp(-log_likelihood/test_words_num)
     return perplexity
 
 
-class PerplexityCalculator():
-    def __init__(self, BOW_filename, k_min, k_max, kstep, rate_of_train_data, conv_det):
-        if (float(rate_of_train_data)>1) & (float(rate_of_train_data)<=0):
+class LDATestPerplexityCalculator(BaseLDATopicNumberSelector):
+    def __init__(self, BOW_filename, k_min, k_max, kstep, rate_of_train_data, conv_det, output_dir):
+        if (float(rate_of_train_data)>1) or (float(rate_of_train_data)<=0):
             exit()
+        super().__init__(BOW_filename, k_min, k_max, kstep, conv_det, output_dir)
         self.BOW, self.word_list = make_bag_of_words_num(BOW_filename)
-        self.k_min = int(k_min)
-        self.k_max = int(k_max)
-        self.kstep = int(kstep)
         self.rate_of_train_data = float(rate_of_train_data)
-        self.conv_det = int(conv_det)
-        self.ID = ''
+        self.make_data_dir()
 
-    def make_output_dir(self):
-        count = 0
-        while True:
-            try:
-                os.mkdir(lda_directory_path + '/output/' + timestamp + '_' + str(count))
-                self.ID = '_' + str(count)
-                break
-            except FileExistsError:
-                pass
-            count += 1
+    def make_data_dir(self):
+        self.data_dir = self.output_dir
 
     def split_train_test(self):
         train_BOW = []
@@ -88,28 +74,24 @@ class PerplexityCalculator():
             test_words = [self.BOW[d][i] for i in test_index]
             train_BOW.append(train_words)
             test_BOW.append(test_words)
-        try:
-            os.mkdir(lda_directory_path + '/data/' + timestamp + self.ID)
-        except FileExistsError:
-            pass
         make_frequency_matrix(train_BOW, self.word_list,
-                              lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW')
+                              self.data_dir + '/trainBOW')
         make_frequency_matrix(test_BOW, self.word_list,
-                              lda_directory_path+'/data/' + timestamp + self.ID + '/testBOW')
+                              self.data_dir + '/testBOW')
         self.test_BOW = test_BOW
 
-    def execute_estimation(self, topic_num):
-        output_dir = lda_directory_path + '/output/' + timestamp + self.ID + '/K_'+str(topic_num)
+    # override
+    def create_command_string(self, topic_num):
+        output_dir = self.output_dir + '/K_'+str(topic_num)
         try:
             os.mkdir(output_dir)
         except FileExistsError:
             pass
-        command = create_command_string(topic_num, lda_directory_path,
-                                        output_dir,
-                                        lda_directory_path + '/data/' + timestamp + self.ID + '/trainBOW', 
-                                        conv_det=self.conv_det)
-        subprocess.call(command.split(' '),
-                        stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        command = lda_directory_path + '/LDA ' + self.data_dir + '/trainBOW'
+        command += (' -k '+str(topic_num))
+        command += (' -d '+str(self.conv_det))
+        command += ' -o ' + output_dir + '/'
+        return command
 
     def calculate_perplexity_each_topic_num(self):
         test_words_num = 0
@@ -117,16 +99,16 @@ class PerplexityCalculator():
             test_words_num += len(document)
         for topic_num in range(self.k_min, self.k_max, self.kstep):
             theta, phi = parse_result(
-                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/theta.csv',
-                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/phi.csv',
-                lda_directory_path+'/output/'+timestamp+self.ID+'/K_'+str(topic_num)+'/wordList.csv'
+                self.output_dir + '/K_'+str(topic_num) + '/theta.csv',
+                self.output_dir + '/K_'+str(topic_num) + '/phi.csv',
+                self.output_dir + '/K_'+str(topic_num) + '/wordList.csv'
             )
-            perplexity = calculate_perplexity(theta, phi, self.test_BOW, test_words_num)
+            perplexity = calculate_lda_perplexity(theta, phi, self.test_BOW, test_words_num)
             print('{0},{1}'.format(topic_num, perplexity))
-
 
     def run(self):
         self.make_output_dir()
+        self.make_data_dir()
         self.split_train_test()
         pool = Pool(processes=5)
         _ = pool.map(self.execute_estimation,
@@ -142,6 +124,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--kstep", help="step number of topics for calculation of perplexity", type=int, default=1)
     parser.add_argument("-r", "--rate", help="rate of train data", default=0.7)
     parser.add_argument("-d", "--conv_det", help="convergence determination", type=float, default=0.001)
+    parser.add_argument("-o", "--output_dir", help="output directory", type=str, default='')
     args = parser.parse_args()
-    calculator = PerplexityCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.rate, args.conv_det)
+    calculator = LDATestPerplexityCalculator(args.BOW_filename, args.k_min, args.k_max, args.kstep, args.rate, args.conv_det, args.output_dir)
     calculator.run()

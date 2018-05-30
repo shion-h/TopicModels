@@ -34,7 +34,6 @@ class VariationalBayesEstimatorOnLDA{
 protected:
     const std::vector<std::vector<unsigned int> > &_frequencyMatrix;
     const std::vector<std::vector<unsigned int> > &_docVoca;
-    const std::vector<std::string> &_wordList;
     const unsigned int _K, _V, _D;
     double _convergenceDiterminationRate;
     std::vector<std::vector<std::vector<double> > > _qz;
@@ -58,10 +57,6 @@ public:
     virtual void updateBeta(BetaUpdateManner manner);
     virtual void updateHyperParameters();
     virtual double calculateVariationalLowerBound()const;
-    virtual void printHyperParameter()const;
-    virtual void printThetaEx()const;
-    virtual void printPhiEx()const;
-    virtual void printNum()const;
     virtual void writeParameter(std::string thetaFilename, std::string phiFilename, std::string alphaFilename, std::string betaFilename)const;
     virtual void writeVariationalLowerBound(std::string VLBFilename, std::string VLBTimeSeriesFilename)const;
     virtual void runIteraions();

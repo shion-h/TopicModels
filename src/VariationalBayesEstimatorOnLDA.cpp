@@ -14,7 +14,6 @@ using namespace std;
 VariationalBayesEstimatorOnLDA::VariationalBayesEstimatorOnLDA(const BOWFileParser &parser, const unsigned int K, const double convergenceDiterminationRate)//{{{
     :_frequencyMatrix(parser.getFrequencyMatrix()),
      _docVoca(parser.getDocVoca()),
-     _wordList(parser.getWordList()),
      _D(_frequencyMatrix.size()),
      _K(K),
      _V(parser.getV()),
@@ -27,7 +26,7 @@ VariationalBayesEstimatorOnLDA::VariationalBayesEstimatorOnLDA(const BOWFilePars
      _nk(K),
      _nd(_D),
      _nkv(K),
-     _ndk(_frequencyMatrix.size()){
+     _ndk(_D){
     this->initializeParam();
     this->initializeHyperParam();
 }//}}}
@@ -141,14 +140,32 @@ void VariationalBayesEstimatorOnLDA::updateQz(){//{{{
             double Zq = 0;
             unsigned int v = _docVoca[d][l];
             for(int k=0; k<_K; k++){
-                double numerator = 0, denominator = 0;
+                double term1 = 0, term2 = 0, term3 = 0, term4 = 0;
                 double xikv = _nkv[k][v] + _beta[v];
                 double xidk = _ndk[d][k] + _alpha[k];
                 double xik = _nk[k] + _betaSum;
                 double xid = _nd[d] + _alphaSum;
-                numerator = exp(boost::math::digamma(xikv)) * exp(boost::math::digamma(xidk));
-                denominator = exp(boost::math::digamma(xik)) * exp(boost::math::digamma(xid));
-                double constProbability = numerator / denominator;
+                try{
+                    term1 = exp(boost::math::digamma(xikv));
+                }catch(...){
+                    term1 = 0;
+                }
+                try{
+                    term2 = exp(boost::math::digamma(xidk));
+                }catch(...){
+                    term2 = 0;
+                }
+                try{
+                    term3 = exp(boost::math::digamma(xik));
+                }catch(...){
+                    term3 = 0;
+                }
+                try{
+                    term4 = exp(boost::math::digamma(xid));
+                }catch(...){
+                    term4 = 0;
+                }
+                double constProbability = (term1 * term2) / (term3 * term4);
                 Zq += constProbability;
                 _qz[d][l][k] = constProbability;
             }
@@ -223,7 +240,12 @@ void VariationalBayesEstimatorOnLDA::updateHyperParameters(){//{{{
     for(int k=0;k<_K;k++){
         double numerator = 0;
         for(int d=0;d<_D;d++){
-            numerator += (boost::math::digamma(_ndk[d][k]+_alpha[k]) - boost::math::digamma(_alpha[k])) * _alpha[k];
+            //ndk == 0 -> alphak == 0  digamma(0) - digamma(0) = 0
+            try{
+                numerator += (boost::math::digamma(_ndk[d][k]+_alpha[k]) - boost::math::digamma(_alpha[k])) * _alpha[k];
+            }catch(...){
+                numerator += 0;
+            }
         }
         _alpha[k] = numerator / denominator;
     }
@@ -243,77 +265,28 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{
     for(int d=0; d<_D; d++){
         term2 += boost::math::lgamma(_alphaSum) - boost::math::lgamma(_nd[d]+_alphaSum);
         for(int k=0; k<_K; k++){
-            term2 += boost::math::lgamma(_ndk[d][k]+_alpha[k]) - boost::math::lgamma(_alpha[k]);
+        //ndk == 0 -> alphak == 0  lgamma(0) - lgamma(0) = 0
+            try{
+                term2 += boost::math::lgamma(_ndk[d][k]+_alpha[k]) - boost::math::lgamma(_alpha[k]);
+            }catch(...){
+                term2 += 0;
+            }
         }
     }
     double term3 = 0;
+    int check = 0;
     for(int d=0;d<_docVoca.size();d++){
         for(int l=0; l<_docVoca[d].size(); l++){
             unsigned int v = _docVoca[d][l];
             for(int k=0; k<_K; k++){
-                term3 += _qz[d][l][k] * log(_qz[d][l][k]) * _frequencyMatrix[d][v];
+                if(_qz[d][l][k] != 0){
+                    term3 += _qz[d][l][k] * log(_qz[d][l][k]) * _frequencyMatrix[d][v];
+                }
             }
         }
     }
     double variationalLowerBound = term1 + term2 - term3;
     return(variationalLowerBound);
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::printHyperParameter()const{//{{{
-    cout<<"_alpha:"<<endl;
-    for(int i=0;i<_alpha.size();i++){
-        cout<<_alpha[i]<<' ';
-    }
-    cout<<endl;
-    cout<<"_beta:"<<endl;
-    for(int i=0;i<_beta.size();i++){
-        cout<<_beta[i]<<' ';
-    }
-    cout<<endl;
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::printThetaEx()const{//{{{
-    cout<<"_thetaEx:"<<endl;
-    for(int i=0;i<_thetaEx.size();i++){
-        for(int j=0;j<_thetaEx[i].size();j++){
-            cout<<_thetaEx[i][j]<<' ';
-        }
-        cout<<endl;
-    }
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::printPhiEx()const{//{{{
-    cout<<"_phiEx:"<<endl;
-    for(int i=0;i<_phiEx.size();i++){
-        for(int j=0;j<_phiEx[i].size();j++){
-            cout<<_phiEx[i][j]<<' ';
-        }
-        cout<<endl;
-    }
-}//}}}
-
-void VariationalBayesEstimatorOnLDA::printNum()const{//{{{
-    cout<<"numOfOccurencesOfTopic:"<<endl;
-    for(int i=0;i<_nk.size();i++){
-        cout<<_nk[i]<<' ';
-    }
-    cout<<endl;
-
-    cout<<"numOfOccurencesOfTopicInDoc:"<<endl;
-    for(int i=0;i<_ndk.size();i++){
-        for(int j=0;j<_ndk[i].size();j++){
-            cout<<_ndk[i][j]<<' ';
-        }
-        cout<<endl;
-    }
-
-    cout<<"numOfOccurencesOfVocaFromTopic:"<<endl;
-    for(int i=0;i<_nkv.size();i++){
-        for(int j=0;j<_nkv[i].size();j++){
-            cout<<_nkv[i][j]<<' ';
-        }
-        cout<<endl;
-    }
 }//}}}
 
 void VariationalBayesEstimatorOnLDA::writeParameter(string thetaFilename, string phiFilename, string alphaFilename, string betaFilename)const{//{{{

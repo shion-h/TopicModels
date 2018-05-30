@@ -46,8 +46,7 @@ void BOWFileParser::readBOWFile(){//{{{
         _frequencyMatrix.push_back(intVec);
     }
 
-
-    _V=_wordList.size();
+    _V = _wordList.size();
 }//}}}
 
 void BOWFileParser::makeDocVoca(){//{{{

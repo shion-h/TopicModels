@@ -7,6 +7,8 @@
 // http://opensource.org/licenses/mit-license.php
 //
 
+#ifndef UTILS
+#define UTILS
 
 #include<vector>
 #include<string>
@@ -53,3 +55,4 @@ void outputVectorForDebug(const std::vector<T> &vector, std::string msg){
     stream<<std::endl;
     stream.close();
 }
+#endif

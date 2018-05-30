@@ -41,8 +41,10 @@ int main(int argc, char *argv[]){
     boost::program_options::variables_map vm;
     try{
         boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(pd).run(), vm);
-    }catch(const boost::program_options::error_with_option_name& e){
-        cout<<e.what()<<endl;
+    // }catch(const boost::program_options::error_with_option_name& e){
+    //     cout<<e.what()<<endl;
+    }catch(...){
+        cout<"Option error."<<endl;
     }
     boost::program_options::notify(vm);
     string BOWFilename;
@@ -69,7 +71,6 @@ int main(int argc, char *argv[]){
         if(vm.count("nmsh"))numOfTopFactor = vm["nmsh"].as<unsigned int>();
         if(vm.count("otpt"))outputDirectory = vm["otpt"].as<std::string>();
         if(outputDirectory[outputDirectory.size()-1] != '/')outputDirectory.push_back('/');
-        cout<<outputDirectory<<endl;
         thetaFilename = outputDirectory + "theta.csv";
         phiFilename = outputDirectory + "phi.csv";
         alphaFilename = outputDirectory + "alpha.csv";
