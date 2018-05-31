@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
     // }catch(const boost::program_options::error_with_option_name& e){
     //     cout<<e.what()<<endl;
     }catch(...){
-        cout<"Option error."<<endl;
+        cout<<"Option error."<<endl;
     }
     boost::program_options::notify(vm);
     string BOWFilename;
