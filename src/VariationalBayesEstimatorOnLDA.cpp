@@ -224,7 +224,11 @@ void VariationalBayesEstimatorOnLDA::updateBeta(BetaUpdateManner manner){//{{{
         for(int v=0;v<_V;v++){
             double numerator=0;
             for(int k=0;k<_K;k++){
-                numerator += (boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
+                try{
+                    numerator += (boost::math::digamma(_nkv[k][v]+_beta[v])-boost::math::digamma(_beta[v]))*_beta[v];
+                }catch(...){
+                    numerator += 0;
+                }
             }
             _beta[v] = numerator/denominator;
         }
@@ -259,7 +263,11 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{
     for(int k=0; k<_K; k++){
         term1 += boost::math::lgamma(_betaSum) - boost::math::lgamma(_nk[k]+_betaSum);
         for(int v=0; v<_V; v++){
-            term1 += boost::math::lgamma(_nkv[k][v]+_beta[v]) - boost::math::lgamma(_beta[v]);
+            try{
+                term1 += boost::math::lgamma(_nkv[k][v]+_beta[v]) - boost::math::lgamma(_beta[v]);
+            }catch(...){
+                term1 += 0;
+            }
         }
     }
     for(int d=0; d<_D; d++){
@@ -274,7 +282,6 @@ double VariationalBayesEstimatorOnLDA::calculateVariationalLowerBound()const{//{
         }
     }
     double term3 = 0;
-    int check = 0;
     for(int d=0;d<_docVoca.size();d++){
         for(int l=0; l<_docVoca[d].size(); l++){
             unsigned int v = _docVoca[d][l];
@@ -301,7 +308,10 @@ void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilena
     ofstream VLBTimeSeriesOutput;
     VLBOutput.open(VLBFilename, ios::out);
     VLBTimeSeriesOutput.open(VLBTimeSeriesFilename, ios::out);
+
+    VLBOutput<<std::setprecision(std::numeric_limits<double>::max_digits10);
     VLBOutput<<_variationalLowerBound<<endl;
+    VLBTimeSeriesOutput<<std::setprecision(std::numeric_limits<double>::max_digits10);
     for(int i=0;i<_VLBTimeSeries.size();i++){
         VLBTimeSeriesOutput<<_VLBTimeSeries[i];
         VLBTimeSeriesOutput<<endl;

@@ -24,7 +24,6 @@ int main(int argc, char *argv[]){
     ("help,h", "show help")
     ("nmtp,k", boost::program_options::value<unsigned int>()->default_value(10), "number of topics")
     ("cdrt,d", boost::program_options::value<double>()->default_value(0.001), "convergence ditermination rate")
-    ("nmsh,f", boost::program_options::value<unsigned int>()->default_value(5), "number of factors with high probability to show")
     ("otpt,o", boost::program_options::value<string>()->default_value("./"), "directory name for output")
     ;
 
@@ -50,7 +49,6 @@ int main(int argc, char *argv[]){
     string BOWFilename;
     unsigned int K;
     double convergenceDiterminationRate;
-    unsigned int numOfTopFactor;
     string outputDirectory;
     string thetaFilename;
     string phiFilename;
@@ -68,7 +66,6 @@ int main(int argc, char *argv[]){
         BOWFilename = vm["BOWfile"].as<std::string>();
         if(vm.count("nmtp"))K = vm["nmtp"].as<unsigned int>();
         if(vm.count("cdrt"))convergenceDiterminationRate = vm["cdrt"].as<double>();
-        if(vm.count("nmsh"))numOfTopFactor = vm["nmsh"].as<unsigned int>();
         if(vm.count("otpt"))outputDirectory = vm["otpt"].as<std::string>();
         if(outputDirectory[outputDirectory.size()-1] != '/')outputDirectory.push_back('/');
         thetaFilename = outputDirectory + "theta.csv";
