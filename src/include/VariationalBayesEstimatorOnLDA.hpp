@@ -20,6 +20,7 @@
 #include<random>
 #include<iomanip>
 #include<fstream>
+#include<limits>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include"BOWFileParser.hpp"

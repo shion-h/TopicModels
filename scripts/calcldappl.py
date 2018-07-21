@@ -107,8 +107,6 @@ class LDATestPerplexityCalculator(BaseLDATopicNumberSelector):
             print('{0},{1}'.format(topic_num, perplexity))
 
     def run(self):
-        self.make_output_dir()
-        self.make_data_dir()
         self.split_train_test()
         pool = Pool(processes=5)
         _ = pool.map(self.execute_estimation,
