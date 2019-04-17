@@ -12,42 +12,42 @@ Regarding python scripts, you should install numpy, scipy, and pandas.
 ## Latent Dirichlet allocation
  LDA [BOW file] [-options] 
 
-Options:
-  -h [ --help ]              show help
-  -k [ --nmtp ] arg (=10)    the number of topics
-  -d [ --cdrt ] arg (=0.001) convergence ditermination rate
-  -o [ --otpt ] arg (=./)    directory name for output
+Options:  
+  -h [ --help ]              show help  
+  -k [ --nmtp ] arg (=10)    the number of topics  
+  -d [ --cdrt ] arg (=0.001) convergence ditermination rate  
+  -o [ --otpt ] arg (=./)    directory name for output  
   
 ## Author topic model
  ATM [BOW file] [author file] [-options] 
 
-Options:
-  -h [ --help ]              show help
-  -k [ --nmtp ] arg (=10)    the number of topics
-  -d [ --cdrt ] arg (=0.001) convergence ditermination rate
-  -o [ --otpt ] arg (=./)    directory name for output
+Options:  
+  -h [ --help ]              show help  
+  -k [ --nmtp ] arg (=10)    the number of topics  
+  -d [ --cdrt ] arg (=0.001) convergence ditermination rate  
+  -o [ --otpt ] arg (=./)    directory name for output  
 
 ## Supervised topic model
  sLDA [BOW file] [label file] [-options] 
 
-Options:
-  -h [ --help ]              show help
-  -k [ --nmtp ] arg (=10)    the number of topics
-  -d [ --cdrt ] arg (=0.001) convergence ditermination rate
-  -o [ --otpt ] arg (=./)    directory name for output
+Options:  
+  -h [ --help ]              show help  
+  -k [ --nmtp ] arg (=10)    the number of topics  
+  -d [ --cdrt ] arg (=0.001) convergence ditermination rate  
+  -o [ --otpt ] arg (=./)    directory name for output  
 
 ## Hierarchical Dirichlet process
  HDP [BOW file] [-options] 
 
-Options:
-  -h [ --help ]             show help
-  -o [ --otpt ] arg (=./)   directory name for output
-  -n [ --itnm ] arg (=1000) the number of iteration
-  -i [ --intr ] arg (=5)    sampling interval
-  -b [ --bnin ] arg (=500)  burn-in term
-  -a [ --alph ] arg (=100)  alpha value
-  -c [ --beta ] arg (=100)  beta value
-  -g [ --gamm ] arg (=100)  gamma value
+Options:  
+  -h [ --help ]             show help  
+  -o [ --otpt ] arg (=./)   directory name for output  
+  -n [ --itnm ] arg (=1000) the number of iteration  
+  -i [ --intr ] arg (=5)    sampling interval  
+  -b [ --bnin ] arg (=500)  burn-in term  
+  -a [ --alph ] arg (=100)  alpha value  
+  -c [ --beta ] arg (=100)  beta value  
+  -g [ --gamm ] arg (=100)  gamma value  
 # Input
   An input file is required to be frequency matrix format. See data/test.csv.  
 # Output
