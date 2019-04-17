@@ -20,6 +20,7 @@
 import argparse
 import numpy as np
 from multiprocessing import Pool
+from multiprocessing import cpu_count
 from msmodule import BaseLDATopicNumberSelector
 
 

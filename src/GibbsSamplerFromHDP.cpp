@@ -136,7 +136,14 @@ void GibbsSamplerFromHDP::sampleKjt(unsigned int j, unsigned int t, bool isNewT/
         }
         _nk[kOld] -= _njt[j][t];
         _mk[kOld]--;
-        if(_mk[kOld] == 0) this->deleteK(kOld);
+        if(_mk[kOld] == 0){
+            if(_nk[kOld] != 0){
+                cout<<"nk error"<<endl;
+                cout<<_mk[kOld]<<' '<<_nk[kOld]<<endl;
+                exit(0);
+            }
+            this->deleteK(kOld);
+        }
     }
     // k used
     vector<double> logDistributionOfK;
@@ -244,7 +251,7 @@ void GibbsSamplerFromHDP::deleteT(unsigned int j, unsigned int t){//{{{ // revis
     _mk[_kjt[j][t]]--;
     if(_mk[_kjt[j][t]] == 0)this->deleteK(_kjt[j][t]);
     for(int i=0; i<_nj[j]; i++){
-        if(_tji[j][i] > t) _tji[j][i] --;
+        if(_tji[j][i] > t) _tji[j][i]--;
     }
     _kjt[j].erase(_kjt[j].begin() + t);
     _njt[j].erase(_njt[j].begin() + t);
@@ -298,7 +305,7 @@ void GibbsSamplerFromHDP::calculateExpectations(bool isUseOnlyLastSample/*=false
 void GibbsSamplerFromHDP::calculateLogLikelihood(){//{{{
     this->calculateExpectations(true);
     double logLikelihood = 0;
-    vector<vector<double> > probabilityMatrix = prod(_thetaEx, _phiEx);
+    vector<vector<double> > probabilityMatrix = dot(_thetaEx, _phiEx);
     for(int j=0; j<_J; j++){
         for(int i=0; i<_nj[j]; i++){
             for(int k=0; k<_K; k++){
