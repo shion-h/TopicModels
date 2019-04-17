@@ -11,7 +11,7 @@
 
 using namespace std;
 
-vector<vector<double> > prod(const vector<vector<double> > &theta, const vector<vector<double> > &phi){
+vector<vector<double> > dot(const vector<vector<double> > &theta, const vector<vector<double> > &phi){
     unsigned int D=theta.size(), K=phi.size(), V=phi[0].size();
     vector<vector<double> > ret(D);
     for(int d=0; d<ret.size(); d++)ret[d].assign(V,0);
@@ -32,7 +32,7 @@ double calculateLogLikelihood(const vector<vector<double> > &theta, const vector
     unsigned int D=docVoca.size(), V=phi[0].size();
     vector<vector<double> > wordProbMat(D);
     for(int d=0;d<wordProbMat.size();d++)wordProbMat[d].assign(V,0);
-    wordProbMat = prod(theta, phi);
+    wordProbMat = dot(theta, phi);
     for(int d=0; d<D; d++){
         double documentLogLikelihood = 0.0;
         for(int l=0; l<docVoca[d].size(); l++){

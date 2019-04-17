@@ -162,7 +162,7 @@ T sum(std::vector<T> vector){
 }
 
 template<typename T>
-std::vector<std::vector<T> > prod(std::vector<std::vector<T> > matrix1, std::vector<std::vector<T> > matrix2){
+std::vector<std::vector<T> > dot(std::vector<std::vector<T> > matrix1, std::vector<std::vector<T> > matrix2){
     std::vector<std::vector<T> > resultMatrix(matrix1.size(), std::vector<T>(matrix2[0].size(), 0));
     for(int i=0; i<matrix1.size(); i++){
         for(int j=0; j<matrix1[0].size(); j++){

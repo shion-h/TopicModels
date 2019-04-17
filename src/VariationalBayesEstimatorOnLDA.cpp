@@ -309,7 +309,7 @@ void VariationalBayesEstimatorOnLDA::writeVariationalLowerBound(string VLBFilena
     VLBOutput.open(VLBFilename, ios::out);
     VLBTimeSeriesOutput.open(VLBTimeSeriesFilename, ios::out);
 
-    VLBOutput<<std::setprecision(std::numeric_limits<double>::max_digits10);
+    VLBOutput<<setprecision(numeric_limits<double>::max_digits10);
     VLBOutput<<_variationalLowerBound<<endl;
     VLBTimeSeriesOutput<<std::setprecision(std::numeric_limits<double>::max_digits10);
     for(int i=0;i<_VLBTimeSeries.size();i++){
