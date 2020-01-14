@@ -1,11 +1,11 @@
 # TopicModels
 # Abstract
-These tools were developed to estimate parameters (including hyper parameters) of some topic models.  
+This C++ code implements Bayesian inference algorithm of topic models.
 # Installation
     cmake . -DCMAKE_CXX_COMPILER=g++
     make
 # Requirements
-Installing the boost library is required for using this tools.  
+The boost library is required.  
 
 Regarding python scripts, you should install numpy, scipy, and pandas.  
 # Usage
@@ -51,7 +51,6 @@ Options:
 # Input
   An input file is required to be frequency matrix format. See data/test.csv.  
 # Output
-  This program outputs the following:  
 ## LDA
   1)topic distribution(theta.csv)  
   2)word distribution(phi.csv)  
