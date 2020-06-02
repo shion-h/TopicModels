@@ -254,7 +254,7 @@ void VariationalBayesEstimatorOnLDA::updateHyperParameters(){//{{{
         _alpha[k] = numerator / denominator;
     }
     _alphaTimeSeries.push_back(_alpha);
-    this->updateBeta(ASYMMETRY);
+    this->updateBeta(SYMMETRY);
     this->calculateHyperParamSum();
 }//}}}
 
