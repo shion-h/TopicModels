@@ -118,6 +118,7 @@ This software is released under the MIT License, see LICENSE.txt.
     cd /path/to/TopicModels/root
     ./LDA /path/to/your/taxonomic/profile/dataset.csv -k 4 -d 1.0e-6 -o /path/to/your/output/directory
     ```
+    - The PATHs are dummies.
     - The number of assemblages (four in the example above) can be changed as needed.
 3. Work in the downstream
     1. You can see theta.csv and phi.csv in /path/to/your/output/directory
