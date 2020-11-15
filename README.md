@@ -105,7 +105,7 @@ optional arguments:
 These scripts output results to /output/(time stamp) directory by default. (time stamp) indecates the date information in MMDD_DAY_hh_mm_ss format.  
 # License
 This software is released under the MIT License, see LICENSE.txt.  
-# How to run for modeling taxonomic profiles [Hosoda et al., Microbiome, 2020](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00864-3)
+# How to run for modeling taxonomic profiles ([Hosoda et al., Microbiome, 2020](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00864-3))
 1. Requirements
     1. Taxonomic profile dataset (Same form as data/test.csv)
         - This is one CSV format file (seperated by commas).
