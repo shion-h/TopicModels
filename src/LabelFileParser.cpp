@@ -57,6 +57,10 @@ void LabelFileParser::makeLabelList(){//{{{
             count++;
         }
     }
+    if(_labelList.size() < 2){
+        cout<<"The number of different labels must be two or more."<<endl<<flush;
+        exit(1);
+    }
     _C = _labelList.size();
 }//}}}
 
